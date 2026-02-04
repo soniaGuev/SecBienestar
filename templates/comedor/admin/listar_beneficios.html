@@ -1,0 +1,189 @@
+<!-- templates/comedor/admin/listar_beneficios.html -->
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="card shadow border-0 rounded-4 mb-4 overflow-hidden">
+    <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-25">
+            <i class="bi bi-gift display-1"></i>
+        </div>
+        <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="fw-bold mb-1">Gestión de Beneficios de Comedor</h2>
+                <p class="mb-0 opacity-90">
+                    Registro completo de todos los beneficios de las becas
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'crear_beneficio' %}"
+                   class="btn btn-light text-primary-custom fw-bold rounded-pill shadow-sm">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Crear Nuevo Beneficio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-custom" role="alert">
+    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="content-card">
+    {% if beneficios %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Tipo de Beca</th>
+                <th>Tipo de Beneficio</th>
+                <th>Descuento</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for beneficio in beneficios %}
+            <tr>
+                <td>
+                    <strong>{{ beneficio.tipo_beca }}</strong>
+                </td>
+                <td>
+                    {% if beneficio.tipo_beneficio == 'gratuito' %}
+                    <span class="badge bg-success">
+                            <i class="bi bi-gift-fill me-1"></i>
+                            Acceso Gratuito
+                        </span>
+                    {% elif beneficio.tipo_beneficio == 'descuento' %}
+                    <span class="badge bg-primary">
+                            <i class="bi bi-percent me-1"></i>
+                            Descuento Porcentual
+                        </span>
+                    {% else %}
+                    <span class="badge bg-secondary">
+                            <i class="bi bi-x-circle me-1"></i>
+                            Sin Beneficio
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if beneficio.porcentaje_descuento == 100 %}
+                    <span class="">
+                            100% - GRATIS
+                        </span>
+                    {% elif beneficio.porcentaje_descuento > 0 %}
+                    <span class="">
+                            {{ beneficio.porcentaje_descuento }}%
+                        </span>
+                    {% else %}
+                    <span class="text-muted">0%</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if beneficio.activo %}
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Activo
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-pause-circle me-1"></i>
+                        Inactivo
+                    </span>
+                    {% endif %}
+                </td>
+                <td class="d-flex justify-content-center">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="{% url 'editar_beneficio' beneficio.pk %}"
+                           class="btn btn-outline-primary"
+                           title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'toggle_activo_beneficio' beneficio.pk %}"
+                           class="btn btn-outline-warning"
+                           title="{% if beneficio.activo %}Desactivar{% else %}Activar{% endif %}">
+                            <i class="bi bi-{% if beneficio.activo %}pause{% else %}play{% endif %}-circle"></i>
+                        </a>
+                        <a href="{% url 'eliminar_beneficio' beneficio.pk %}"
+                           class="btn btn-outline-danger"
+                           title="Eliminar"
+                           onclick="return confirm('¿Estás seguro de eliminar este beneficio?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <h6 class="mb-2">
+            <i class="bi bi-info-circle me-2"></i>
+            Información importante
+        </h6>
+        <ul class="mb-0 small">
+            <li>Los tipos de beca deben coincidir exactamente con los configurados en el sistema de Personas</li>
+            <li>Solo se aplica un beneficio por estudiante (el primero que se encuentre activo)</li>
+            <li>Los beneficios inactivos no se aplican aunque la beca esté activa</li>
+            <li>Para acceso gratuito, usa un descuento del 100%</li>
+        </ul>
+    </div>
+
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-gift" style="font-size: 64px; color: #ccc;"></i>
+        <p class="text-muted mt-3">No hay beneficios configurados aún</p>
+        <a href="{% url 'crear_beneficio' %}" class="btn btn-success mt-2">
+            <i class="bi bi-plus-circle me-2"></i>
+            Crear Primer Beneficio
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+      :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .btn-group-sm .btn {
+        padding: 4px 8px;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

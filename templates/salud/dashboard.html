@@ -1,0 +1,52 @@
+{% extends "bienestar_layout/base_bienestar.html" %}
+{% block title %}Salud{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <h2 class="fw-bold mb-4">Salud Estudiantil</h2>
+
+    <div class="row g-4">
+
+        <!-- Cobertura -->
+        <div class="col-md-4">
+            <div class="card shadow-sm rounded-4 h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold">🫀 Cobertura</h5>
+                    <p class="text-muted mt-2">
+                        No tenés cobertura de salud activa.
+                    </p>
+                    <a href="#" class="btn btn-outline-success btn-sm">
+                        Contratar plan
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Turnos -->
+        <div class="col-md-4">
+            <div class="card shadow-sm rounded-4 h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold">📅 Turnos</h5>
+                    <p class="text-muted mt-2">
+                        No tenés turnos asignados.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial -->
+        <div class="col-md-4">
+            <div class="card shadow-sm rounded-4 h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold">📄 Historial</h5>
+                    <p class="text-muted mt-2">
+                        No hay atenciones registradas.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

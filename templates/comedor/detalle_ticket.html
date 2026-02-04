@@ -1,0 +1,246 @@
+{% extends 'bienestar_layout/base_bienestar.html' %}
+{% load static %}
+
+{% block title %}Ticket #{{ ticket.numero_ticket }}{% endblock %}
+
+{% block content %}
+<div class="ticket-detail-wrapper py-5">
+    <div class="container">
+
+        <!-- Botón Volver -->
+        <div class="mb-4">
+            <a href="{% url 'mis_tickets' %}" class="btn btn-link text-decoration-none text-muted p-0 fw-semibold">
+                <i class="bi bi-arrow-left me-2"></i>Volver a mis tickets
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+
+                <!-- Tarjeta Principal del Ticket -->
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden ticket-card">
+                    <!-- Encabezado Visual -->
+                    <div class="ticket-header p-4 text-white position-relative">
+                        <div class="d-flex justify-content-between align-items-center position-relative z-1">
+                            <div>
+                                <h6 class="text-uppercase opacity-75 mb-1 ls-1" style="font-size: 0.8rem;">Comedor Universitario</h6>
+                                <h2 class="fw-bold mb-0">Ticket de Menú</h2>
+                            </div>
+                            <div class="text-end">
+                                <span class="d-block fw-bold fs-4">#{{ ticket.numero_ticket }}</span>
+                                <span class="badge bg-white text-success rounded-pill px-3 shadow-sm">
+                                    {{ ticket.get_estado_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="row g-0">
+
+                            <!-- Columna Izquierda: Información -->
+                            <div class="col-lg-8 p-4 p-md-5 border-end-dashed">
+                                <div class="mb-4">
+                                    <h5 class="fw-bold text-primary-custom mb-4">
+                                        <i class="bi bi-info-circle me-2"></i>Detalles de la Reserva
+                                    </h5>
+
+                                    <div class="row g-4">
+                                        <div class="col-sm-6">
+                                            <label class="small text-muted text-uppercase fw-bold mb-1">Tipo de Menú</label>
+                                            <p class="fw-bold text-dark fs-5 mb-0">{{ ticket.tipo_menu.nombre }}</p>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="small text-muted text-uppercase fw-bold mb-1">Precio Pagado</label>
+                                            <p class="fw-bold text-dark fs-5 mb-0">${{ ticket.precio_pagado }}</p>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="small text-muted text-uppercase fw-bold mb-1">Fecha de Compra</label>
+                                            <p class="fw-semibold text-dark mb-0">
+                                                <i class="bi bi-calendar3 me-2 text-primary-custom"></i>{{ ticket.fecha_compra|date:"d/m/Y" }}
+                                                <small class="text-muted ms-1">{{ ticket.fecha_compra|date:"H:i" }}hs</small>
+                                            </p>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="small text-muted text-uppercase fw-bold mb-1">Válido Hasta</label>
+                                            <p class="fw-semibold text-danger mb-0">
+                                                <i class="bi bi-hourglass-split me-2"></i>{{ ticket.fecha_valido_hasta|date:"d/m/Y" }}
+                                            </p>
+                                        </div>
+
+
+                                        {% if ticket.fecha_uso %}
+                                        <div class="col-12">
+                                            <div class="alert alert-secondary d-flex align-items-center mb-0 border-0">
+                                                <i class="bi bi-check-all fs-4 me-3"></i>
+                                                <div>
+                                                    <strong class="d-block">Ticket Utilizado</strong>
+                                                    <span class="small">Fecha de consumo: {{ ticket.fecha_uso|date:"d/m/Y H:i" }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Formulario Celiaquía (Si aplica) -->
+                                {% if ticket.formulario_celiaquia %}
+                                <div class="mt-4 pt-4 border-top">
+                                    <h6 class="fw-bold text-primary-custom mb-3">Documentación Adjunta</h6>
+                                    <a href="{{ ticket.formulario_celiaquia.url }}" target="_blank" class="btn btn-outline-primary-custom rounded-pill w-100 py-2">
+                                        <i class="bi bi-file-earmark-medical me-2"></i>Ver Formulario de Celiaquía
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Columna Derecha: Código QR -->
+                            <div class="col-lg-4 bg-light bg-opacity-50 p-4 p-md-5 d-flex flex-column justify-content-center align-items-center text-center position-relative">
+
+                                {% if ticket.qr_code %}
+                                    <div class="qr-box bg-white p-3 rounded-4 shadow-sm mb-3 position-relative">
+                                        <img src="{{ ticket.qr_code.url }}" alt="Código QR" class="img-fluid rounded-3" style="max-width: 180px;">
+                                        <!-- Logo overlay opcional en el QR -->
+                                        <div class="position-absolute top-50 start-50 translate-middle p-1" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        </div>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">Escanear en Ingreso</h6>
+                                    <p class="text-muted small mb-3">Presenta este código en el lector.</p>
+
+                                {% else %}
+                                    <div class="py-5">
+                                        <i class="bi bi-qr-code-scan text-muted opacity-25" style="font-size: 5rem;"></i>
+                                        <p class="text-muted mt-3">Código QR no disponible</p>
+                                    </div>
+                                {% endif %}
+
+                                <div class="mt-4 pt-3 border-top w-100">
+                                    <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Código Alfanumérico</small>
+                                    <span class="font-monospace fw-bold fs-5 text-dark">{{ ticket.codigo }}</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted small">
+                        <i class="bi bi-shield-check me-1"></i> Ticket válido solo para el titular. Prohibida su reventa.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+        --accent-custom: #f9a826;
+    }
+
+    .ticket-detail-wrapper {
+        min-height: 90vh;
+        background-color: #f4f7f6;
+        background-image: radial-gradient(#e9ecef 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    /* Estilos del Header del Ticket */
+    .ticket-header {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%);
+    }
+
+    /* Efecto de Troquel (Muescas) */
+    .ticket-notch {
+        position: absolute;
+        bottom: -15px;
+        width: 30px;
+        height: 30px;
+        background-color: #f4f7f6; /* Debe coincidir con el fondo de la página */
+        border-radius: 50%;
+        z-index: 2;
+    }
+    .notch-left { left: -15px; }
+    .notch-right { right: -15px; }
+
+    /* Línea divisoria punteada para escritorio */
+    .border-end-dashed {
+        border-right: 2px dashed #dee2e6;
+    }
+
+    /* Ajustes Responsive */
+    @media (max-width: 991.98px) {
+        .border-end-dashed {
+            border-right: none;
+            border-bottom: 2px dashed #dee2e6;
+        }
+
+        .ticket-notch {
+            bottom: auto;
+            top: 100%; /* Mover las muescas para separar header de body si se desea, o ocultar */
+            display: none; /* En móvil simplificamos ocultando las muescas laterales del header */
+        }
+    }
+
+    /* Iconos */
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    /* Textos y Botones */
+    .text-primary-custom { color: var(--primary-custom) !important; }
+    .ls-1 { letter-spacing: 1px; }
+
+    .btn-outline-primary-custom {
+        color: var(--primary-custom);
+        border: 1px solid var(--primary-custom);
+        background: transparent;
+        transition: all 0.2s;
+    }
+    .btn-outline-primary-custom:hover {
+        background-color: var(--primary-custom);
+        color: white;
+    }
+
+    /* Efecto Hover en QR */
+    .qr-box {
+        transition: transform 0.3s ease;
+    }
+    .qr-box:hover {
+        transform: scale(1.03);
+    }
+
+    /* Estilos de Impresión */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .ticket-card, .ticket-card * {
+            visibility: visible;
+        }
+        .ticket-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            border: 2px solid #000;
+        }
+        .btn, .no-print {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}

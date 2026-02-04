@@ -1,0 +1,68 @@
+<!-- templates/comedor/carrousel.html -->
+{% extends 'bienestar_layout/base_bienestar.html' %}
+
+{% block content %}
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            {% if imagenes %}
+            <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+                <!-- Indicadores -->
+                <div class="carousel-indicators">
+                    {% for imagen in imagenes %}
+                    <button type="button" data-bs-target="#carouselExampleCaptions" 
+                            data-bs-slide-to="{{ forloop.counter0 }}" 
+                            {% if forloop.first %}class="active" aria-current="true"{% endif %}
+                            aria-label="Slide {{ forloop.counter }}"></button>
+                    {% endfor %}
+                </div>
+
+                <!-- Slides -->
+                <div class="carousel-inner rounded-3 shadow-lg">
+                    {% for imagen in imagenes %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ imagen.imagen.url }}" class="d-block w-100" alt="{{ imagen.titulo }}" style="max-height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block" style="padding: 20px; border-radius: 10px; color: black;">
+                            <h5 class="fw-bold">{{ imagen.titulo }}</h5>
+                            {% if imagen.descripcion %}
+                            <p>{{ imagen.descripcion }}</p>
+                            {% endif %}
+                            {% if imagen.dia_semana %}
+                            <span class="badge bg-warning text-dark">{{ imagen.get_dia_semana_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Controles -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Siguiente</span>
+                    </button>
+            </div>
+            {% else %}
+            <!-- Mensaje cuando no hay imágenes -->
+            <div class="text-center text-white py-5">
+                <i class="bi bi-image" style="font-size: 5rem; opacity: 0.5;"></i>
+                <h3 class="mt-4 text-black-50">No hay menús disponibles en este momento</h3>
+                <p class="lead text-black-50">Pronto tendremos las comidas de la semana para ti</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div class="container my-5">
+    <div class="text-center">
+        <a href="{% url 'comprar_tickets' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-cart-plus me-2"></i>
+            Comprar Tickets
+        </a>
+    </div>
+</div>
+{% endblock %}

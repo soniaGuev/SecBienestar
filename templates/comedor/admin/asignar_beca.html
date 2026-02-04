@@ -1,0 +1,356 @@
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<h3 class="page-title">
+    <i class="bi bi-award-fill me-2"></i>
+    Asignar Beca a {{ estudiante.persona.nombre_completo }}
+</h3>
+
+<div class="content-card">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Información del estudiante -->
+    <div class="alert alert-info mb-4">
+        <h5><i class="bi bi-person-badge me-2"></i>Información del Estudiante</h5>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <p><strong>Legajo:</strong> {{ estudiante.numero_legajo }}</p>
+                <p><strong>Carrera:</strong> {{ estudiante.carrera.nombre }}</p>
+                <p><strong>Estado Académico:</strong> {{ estudiante.get_estado_academico_display }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Documento:</strong> {{ estudiante.persona.documento }}</p>
+                <p><strong>Año de ingreso:</strong> {{ estudiante.anio_ingreso }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE VALIDACIÓN DE DOCUMENTACIÓN -->
+    <div class="card mb-4 {% if estudiante.validado_como_regular %}border-success{% else %}border-warning{% endif %}">
+        <div class="card-header {% if estudiante.validado_como_regular %}bg-success text-white{% else %}bg-warning{% endif %}">
+            <h5 class="mb-0">
+                <i class="bi bi-file-earmark-check me-2"></i>
+                Estado de Validación como Alumno Regular
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if estudiante.validado_como_regular %}
+                <div class="alert alert-success mb-3">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>✓ ESTUDIANTE VALIDADO COMO ALUMNO REGULAR</strong>
+                    <br>
+                    <small class="mt-2 d-block">
+                        Validado el: {{ estudiante.fecha_validacion_regular|date:"d/m/Y H:i" }}
+                        {% if estudiante.validado_por %}
+                        por {{ estudiante.validado_por.get_full_name|default:estudiante.validado_por.username }}
+                        {% endif %}
+                    </small>
+                    {% if estudiante.observaciones_validacion %}
+                    <small class="mt-1 d-block">
+                        <strong>Observaciones:</strong> {{ estudiante.observaciones_validacion }}
+                    </small>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning mb-3">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>⚠ PENDIENTE DE VALIDACIÓN</strong>
+                    <br>
+                    <small>El estudiante debe ser validado como alumno regular antes de asignar beca de comedor</small>
+                </div>
+            {% endif %}
+
+            <!-- Documentación del estudiante -->
+            <h6 class="mt-3 mb-3">
+                <i class="bi bi-paperclip me-2"></i>
+                Documentación Presentada
+            </h6>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Certificado de Alumno Regular:</label>
+                        {% if estudiante.certificado_regular %}
+                        <div>
+                            <span class="badge bg-success me-2">
+                                <i class="bi bi-file-earmark-pdf"></i> Documento cargado
+                            </span>
+                            <a href="{{ estudiante.certificado_regular.url }}"
+                               target="_blank"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i> Ver certificado
+                            </a>
+                        </div>
+                        {% if estudiante.fecha_vencimiento_certificado %}
+                        <small class="text-muted d-block mt-1">
+                            Válido hasta: {{ estudiante.fecha_vencimiento_certificado|date:"d/m/Y" }}
+                            {% if estudiante.fecha_vencimiento_certificado < today %}
+                            <span class="badge bg-danger">VENCIDO</span>
+                            {% endif %}
+                        </small>
+                        {% endif %}
+                        {% else %}
+                        <div>
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle"></i> No cargado
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if estudiante.persona.nacionalidad != "Argentina" %}
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Carta de Aceptación (Extranjero):</label>
+                        {% if estudiante.carta_aceptacion %}
+                        <div>
+                            <span class="badge bg-success me-2">
+                                <i class="bi bi-file-earmark-pdf"></i> Documento cargado
+                            </span>
+                            <a href="{{ estudiante.carta_aceptacion.url }}"
+                               target="_blank"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i> Ver carta
+                            </a>
+                        </div>
+                        {% if estudiante.fecha_vencimiento_carta %}
+                        <small class="text-muted d-block mt-1">
+                            Válido hasta: {{ estudiante.fecha_vencimiento_carta|date:"d/m/Y" }}
+                        </small>
+                        {% endif %}
+                        {% else %}
+                        <div>
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle"></i> No cargado
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Formulario de validación -->
+            {% if not estudiante.validado_como_regular %}
+            <hr class="my-4">
+            <h6 class="mb-3">
+                <i class="bi bi-clipboard-check me-2"></i>
+                Validar Documentación
+            </h6>
+
+            {% if not estudiante.certificado_regular %}
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <strong>No se puede validar:</strong> El estudiante debe cargar el certificado de alumno regular primero.
+            </div>
+            {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="validar_estudiante" value="1">
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ validacion_form.validado }}
+                        <label class="form-check-label fw-bold" for="{{ validacion_form.validado.id_for_label }}">
+                            {{ validacion_form.validado.label }}
+                        </label>
+                    </div>
+                    <small class="form-text text-muted">{{ validacion_form.validado.help_text }}</small>
+                </div>
+
+                <div class="mb-3">
+                    {{ validacion_form.observaciones.label_tag }}
+                    {{ validacion_form.observaciones }}
+                    <small class="form-text text-muted">{{ validacion_form.observaciones.help_text }}</small>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Validar Estudiante
+                </button>
+            </form>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Formulario de asignación de beca -->
+    {% if not becas_disponibles %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>No hay becas disponibles.</strong> Debes crear becas en el catálogo antes de asignarlas.
+            <a href="{% url 'crear_beca_catalogo' %}" class="alert-link">Crear nueva beca</a>
+        </div>
+    {% else %}
+    <form method="post" enctype="multipart/form-data" id="asignarBecaForm">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Seleccionar Beca del Catálogo -->
+                <div class="mb-3">
+                    <label for="beca_id" class="form-label fw-bold">
+                        <i class="bi bi-award me-2"></i>
+                        Seleccionar Beca *
+                    </label>
+                    <select name="beca_id" id="beca_id" class="form-select" required>
+                        <option value="">-- Seleccione una beca --</option>
+                        {% for beca in becas_disponibles %}
+                        <option value="{{ beca.id }}"
+                                data-tiene-monto="{{ beca.tiene_monto|yesno:'true,false' }}"
+                                data-monto-sugerido="{{ beca.monto_sugerido|default:'' }}"
+                                data-permite-comedor="{{ beca.permite_comedor|yesno:'true,false' }}"
+                                data-es-comedor="{{ beca.tipo|lower }}"
+                                {% if beca.tipo|lower == 'comedor' and not estudiante.validado_como_regular %}disabled{% endif %}>
+                            {{ beca.tipo }}
+                            {% if beca.tiene_monto %} - ${{ beca.monto_sugerido }}{% endif %}
+                            {% if beca.permite_comedor %} (Comedor){% endif %}
+                            {% if beca.tipo|lower == 'comedor' and not estudiante.validado_como_regular %}
+                            - ⚠ Requiere validación
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">
+                        Las becas de comedor requieren validación previa del estudiante
+                    </small>
+                </div>
+
+                <!-- Fecha Inicio -->
+                <div class="mb-3">
+                    <label for="fecha_inicio" class="form-label fw-bold">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        Fecha de Inicio *
+                    </label>
+                    <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Estado de la Beca -->
+                <div class="mb-3">
+                    <label for="estado_beca" class="form-label fw-bold">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        Estado de la Beca *
+                    </label>
+                    <select name="estado_beca" id="estado_beca" class="form-select" required>
+                        {% for codigo, nombre in estados_beca %}
+                        <option value="{{ codigo }}" {% if codigo == 'PENDIENTE' %}selected{% endif %}>{{ nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Fecha Fin -->
+                <div class="mb-3">
+                    <label for="fecha_fin" class="form-label fw-bold">
+                        <i class="bi bi-calendar-x me-2"></i>
+                        Fecha de Fin *
+                    </label>
+                    <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campo Monto (solo si la beca tiene_monto=True) -->
+        <div id="seccionMonto" style="display: none;">
+            <hr class="my-4">
+            <h5 class="mb-3">
+                <i class="bi bi-cash-coin me-2"></i>
+                Monto Monetario
+            </h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="monto_asignado" class="form-label fw-bold">
+                            Monto Asignado ($) *
+                        </label>
+                        <input type="number"
+                               name="monto_asignado"
+                               id="monto_asignado"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               placeholder="0.00">
+                        <small class="form-text text-muted">
+                            Se usará el monto sugerido si no se especifica uno diferente
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'detalle_beneficiario' estudiante.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle me-2"></i>
+                Asignar Beca
+            </button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const becaSelect = document.getElementById('beca_id');
+    const seccionMonto = document.getElementById('seccionMonto');
+    const montoInput = document.getElementById('monto_asignado');
+
+    // Manejar cambio de beca seleccionada
+    becaSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+
+        if (!selectedOption.value) {
+            seccionMonto.style.display = 'none';
+            return;
+        }
+
+        const tieneMonto = selectedOption.dataset.tieneMonto === 'true';
+        const montoSugerido = selectedOption.dataset.montoSugerido;
+        const esComedor = selectedOption.dataset.esComedor === 'comedor';
+
+        // Mostrar/ocultar sección de monto
+        if (tieneMonto) {
+            seccionMonto.style.display = 'block';
+            montoInput.value = montoSugerido;
+            montoInput.placeholder = `Monto sugerido: $${montoSugerido}`;
+        } else {
+            seccionMonto.style.display = 'none';
+            montoInput.value = '';
+        }
+    });
+});
+</script>
+
+<style>
+.content-card {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.form-label {
+    color: #34495e;
+}
+</style>
+{% endblock %}

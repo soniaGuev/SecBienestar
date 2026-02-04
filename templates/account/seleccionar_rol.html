@@ -1,0 +1,285 @@
+{% extends "bienestar_layout/base_bienestar.html" %}
+{% load static %}
+
+{% block content %}
+<div class="rol-selection-wrapper d-flex align-items-center justify-content-center">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-10">
+                <div class="card shadow-lg overflow-hidden border-0 rounded-4">
+
+                    <!-- Header -->
+                    <div class="card-header bg-gradient-custom text-white text-center py-5 position-relative">
+                        <div class="decoration-circle circle-1"></div>
+                        <div class="decoration-circle circle-2"></div>
+
+                        <div class="position-relative z-1">
+                            <div class="icon-box bg-white bg-opacity-10 rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center backdrop-blur">
+                                <i class="bi bi-person-badge fs-1"></i>
+                            </div>
+                            <h2 class="fw-bold mb-2">¡Bienvenido, {{ user.first_name }}!</h2>
+                            <p class="lead mb-0 opacity-90">Para continuar, cuéntanos cuál es tu rol en la
+                                universidad</p>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-4 p-md-5 bg-white">
+
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-dark mb-4 d-block text-center fs-5">
+                                    <i class="bi bi-question-circle me-2"></i>Selecciona tu rol:
+                                </label>
+
+                                <div class="row g-4">
+                                    <!-- Grupo Académico -->
+                                    <div class="col-md-6 border-end-md">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="icon-header bg-success bg-opacity-10 text-success rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="bi bi-mortarboard"></i>
+                                            </div>
+                                            <h6 class="fw-bold text-uppercase text-muted mb-0">Académico</h6>
+                                        </div>
+
+                                        <div class="d-grid gap-2">
+                                            {% for value, label in form.rol.field.choices %}
+                                            {% if value == 'ingresante' or value == 'estudiante' or value == 'egresado' %}
+                                            <div class="position-relative">
+                                                <input type="radio" class="btn-check" name="rol" id="rol_{{ value }}"
+                                                       value="{{ value }}" required>
+                                                <label class="btn btn-outline-custom w-100 p-3 text-start d-flex align-items-center"
+                                                       for="rol_{{ value }}">
+                                                    {% if value == 'ingresante' %}
+                                                    <i class="bi bi-arrow-up-right-square-fill fs-4 text-primary-custom me-3"></i>
+                                                    {% elif value == 'estudiante' %}
+                                                    <i class="bi bi-mortarboard-fill fs-4 text-primary-custom me-3"></i>
+                                                    {% elif value == 'egresado' %}
+                                                    <i class="bi bi-patch-check-fill fs-4 text-primary-custom me-3"></i>
+                                                    {% endif %}
+                                                    <div>
+                                                        <span class="fw-bold d-block">{{ label }}</span>
+                                                    </div>
+                                                    <div class="check-indicator ms-auto">
+                                                        <i class="bi bi-check-circle-fill fs-5"></i>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Grupo Laboral -->
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="icon-header bg-info bg-opacity-10 text-info rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="bi bi-briefcase"></i>
+                                            </div>
+                                            <h6 class="fw-bold text-uppercase text-muted mb-0">Laboral</h6>
+                                        </div>
+
+                                        <div class="d-grid gap-2">
+                                            {% for value, label in form.rol.field.choices %}
+                                            {% if value == 'docente' or value == 'no_docente' %}
+                                            <div class="position-relative">
+                                                <input type="radio" class="btn-check" name="rol" id="rol_{{ value }}"
+                                                       value="{{ value }}" required>
+                                                <label class="btn btn-outline-custom w-100 p-3 text-start d-flex align-items-center"
+                                                       for="rol_{{ value }}">
+                                                    {% if value == 'docente' %}
+                                                    <i class="bi bi-book-fill fs-4 text-success me-3"></i>
+                                                    {% elif value == 'no_docente' %}
+                                                    <i class="bi bi-briefcase-fill fs-4 text-info me-3"></i>
+                                                    {% endif %}
+                                                    <div>
+                                                        <span class="fw-bold d-block">{{ label }}</span>
+                                                    </div>
+                                                    <div class="check-indicator ms-auto">
+                                                        <i class="bi bi-check-circle-fill fs-5"></i>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if form.rol.errors %}
+                                <div class="alert alert-danger d-flex align-items-center mt-3 p-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    <div class="small">
+                                        {% for error in form.rol.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <hr class="my-4 opacity-10">
+
+                            <div class="alert alert-light border shadow-sm d-flex align-items-start mb-4" role="alert">
+                                <i class="bi bi-info-circle-fill text-primary-custom me-2 mt-1"></i>
+                                <div class="small text-muted">
+                                    <strong>Importante:</strong> Esta selección habilitará los formularios específicos para tu perfil.
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary-custom btn-lg py-3 fw-bold shadow-sm">
+                                    Continuar <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-custom: var(--primary-color, #2C7D4B);
+        --primary-dark: #1e5c35;
+        --accent-custom: var(--accent-color, #f9a826);
+    }
+
+    .rol-selection-wrapper {
+        min-height: 90vh;
+        background-color: #f4f7f6;
+        background-image: radial-gradient(at 100% 0%, rgba(44, 125, 75, 0.05) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(249, 168, 38, 0.05) 0px, transparent 50%);
+    }
+
+    /* Gradient Header */
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, #1a5235 0%, var(--primary-custom) 100%);
+    }
+
+    .decoration-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 0;
+    }
+
+    .circle-1 {
+        width: 250px;
+        height: 250px;
+        top: -100px;
+        right: -80px;
+    }
+
+    .circle-2 {
+        width: 150px;
+        height: 150px;
+        bottom: -50px;
+        left: -40px;
+    }
+
+    .backdrop-blur {
+        backdrop-filter: blur(5px);
+        width: 80px;
+        height: 80px;
+    }
+
+    .icon-box i {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Radio Button Cards - MODIFICADO PARA SER MÁS COMPACTO */
+    .btn-outline-custom {
+        border: 1px solid #e9ecef; /* Borde más sutil */
+        background-color: #fff;
+        transition: all 0.2s ease;
+        /* Eliminado min-height: 160px; */
+        border-radius: 10px;
+    }
+
+    .btn-outline-custom:hover {
+        border-color: var(--primary-custom);
+        background-color: #f8fff9; /* Fondo muy sutil al hover */
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        color: var(--primary-dark);
+    }
+
+    .btn-check:checked + .btn-outline-custom {
+        background-color: #f0fdf4; /* Fondo verde muy claro en lugar de sólido fuerte */
+        border-color: var(--primary-custom);
+        border-width: 2px;
+        color: var(--primary-dark);
+        box-shadow: 0 4px 12px rgba(44, 125, 75, 0.15);
+    }
+
+    /* El icono mantiene su color original al seleccionarse para mejor contraste */
+    .btn-check:checked + .btn-outline-custom i.text-primary-custom,
+    .btn-check:checked + .btn-outline-custom i.text-success,
+    .btn-check:checked + .btn-outline-custom i.text-info {
+        filter: brightness(0.9);
+    }
+
+    .check-indicator {
+        opacity: 0;
+        transform: scale(0.8);
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-check:checked + .btn-outline-custom .check-indicator {
+        opacity: 1;
+        transform: scale(1);
+        color: var(--primary-custom);
+    }
+
+    /* Primary Button */
+    .btn-primary-custom {
+        background-color: var(--primary-custom);
+        border: none;
+        color: white;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(44, 125, 75, 0.2) !important;
+        color: white;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom);
+    }
+
+    /* Separador en desktop */
+    @media (min-width: 768px) {
+        .border-end-md {
+            border-right: 1px solid #dee2e6;
+        }
+    }
+</style>
+
+<script>
+    // Bootstrap validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock content %}

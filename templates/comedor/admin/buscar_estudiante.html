@@ -1,0 +1,114 @@
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="card shadow border-0 rounded-4 mb-4 overflow-hidden">
+    <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-25">
+            <i class="bi bi-search display-1"></i>
+        </div>
+        <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                 <h2 class="fw-bold mb-1">Buscar Estudiante</h2>
+            </div>
+            <a href="{% url 'listar_beneficiarios' %}" class="btn btn-outline-light">
+            <i class="bi bi-arrow-left me-2"></i>
+            Volver
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="content-card">
+    <form method="get" class="mb-4">
+        <div class="input-group input-group-lg">
+            <input type="text" name="q" class="form-control"
+                   placeholder="Buscar por nombre, apellido, legajo o documento"
+                   value="{{ search_query }}" autofocus>
+            <button class="btn btn-primary" type="submit">
+                <i class="bi bi-search me-2"></i>
+                Buscar
+            </button>
+        </div>
+    </form>
+
+    {% if search_query %}
+        {% if estudiantes %}
+        <h5 class="mb-3">Resultados de búsqueda:</h5>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Legajo</th>
+                        <th>Estudiante</th>
+                        <th>Carrera</th>
+                        <th>Becas Actuales</th>
+                        <th class="text-end">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for estudiante in estudiantes %}
+                    <tr>
+                        <td><strong>{{ estudiante.numero_legajo }}</strong></td>
+                        <td>
+                            {{ estudiante.persona.apellido }}, {{ estudiante.persona.nombre }}
+                            <br>
+                            <small class="text-muted">DNI: {{ estudiante.persona.documento }}</small>
+                        </td>
+                        <td><small>{{ estudiante.carrera.nombre|truncatewords:5 }}</small></td>
+                        <td>
+                            {% with becas=estudiante.becas.all %}
+                            <span class="badge bg-secondary">{{ becas.count }} beca(s)</span>
+                            {% endwith %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'asignar_beca' estudiante.id %}"
+                               class="btn btn-success btn-sm">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                Asignar Beca
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            No se encontraron estudiantes con el criterio "{{ search_query }}"
+        </div>
+        {% endif %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-search" style="font-size: 64px; color: #ccc;"></i>
+        <p class="text-muted mt-3">Ingresa un nombre, legajo o documento para buscar</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+      :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+.content-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.page-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+</style>
+{% endblock %}

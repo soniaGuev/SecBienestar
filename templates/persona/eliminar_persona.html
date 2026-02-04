@@ -1,0 +1,44 @@
+<!-- templates/comedor/admin/confirmar_eliminacion_beneficio.html -->
+{% extends 'persona/panel_persona.html' %}
+
+{% block admin_content %}
+<div class="content-card">
+    <h3 class="mb-4 text-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Confirmar Eliminación
+    </h3>
+
+    <div class="alert alert-danger">
+        <h5 class="alert-heading">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            ¿Estás seguro de eliminar Perfil?
+        </h5>
+        <hr>
+        <p class="mb-0">
+            Esta acción eliminará permanentemente el usuario
+            <strong>{{ persona.nombre_completo }}</strong>.
+        </p>
+    </div>
+
+    <form method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-2"></i>
+            Sí, eliminar Perfil
+        </button>
+        <a href="{% url 'listar_personas' %}" class="btn btn-secondary ms-2">
+            <i class="bi bi-x-circle me-2"></i>
+            Cancelar
+        </a>
+    </form>
+</div>
+
+<style>
+.content-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

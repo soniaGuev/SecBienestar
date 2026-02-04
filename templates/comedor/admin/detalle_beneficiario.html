@@ -1,0 +1,373 @@
+<!-- templates/comedor/admin/detalle_beneficiario.html -->
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="card shadow border-0 rounded-4 mb-2 overflow-hidden">
+    <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-25">
+            <i class="bi bi-person-badge display-1"></i>
+        </div>
+        <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                 <h2 class="fw-bold mb-1">Informacion personal de {{ estudiante.persona.nombre_completo }}</h2>
+            </div>
+            <a href="{% url 'listar_beneficiarios' %}" class="btn btn-outline-light">
+            <i class="bi bi-arrow-left me-2"></i>
+            Volver
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- Información del estudiante -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="content-card">
+            <h5 class="mb-3">
+                <i class="bi bi-info-circle me-2"></i>
+                Información Personal
+            </h5>
+            <table class="table table-borderless table-sm">
+                <tr>
+                    <th width="150">Legajo:</th>
+                    <td><strong>{{ estudiante.numero_legajo }}</strong></td>
+                </tr>
+                <tr>
+                    <th>Documento:</th>
+                    <td>{{ estudiante.persona.get_tipo_documento_display }} {{ estudiante.persona.documento }}</td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td>{{ estudiante.persona.correo }}</td>
+                </tr>
+                <tr>
+                    <th>Teléfono:</th>
+                    <td>{{ estudiante.persona.telefono|default:"No especificado" }}</td>
+                </tr>
+                <tr>
+                    <th>Carrera:</th>
+                    <td>{{ estudiante.carrera.nombre }}</td>
+                </tr>
+                <tr>
+                    <th>Estado:</th>
+                    <td>
+                        <span class="badge bg-info">{{ estudiante.get_estado_academico_display }}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Año ingreso:</th>
+                    <td>{{ estudiante.anio_ingreso }}</td>
+                </tr>
+                <!--
+                <tr>
+                    <th>Certificado Celíaco:</th>
+                    <td>
+                        {% if estudiante.persona.certificado_celiaco %}
+                        {% if estudiante.persona.certificado_celiaco.esta_vigente %}
+                        <span class="badge bg-success">
+                    <i class="bi bi-file-medical-fill me-1"></i>Vigente
+                </span>
+                        {% else %}
+                        <span class="badge bg-danger">
+                    <i class="bi bi-file-medical-fill me-1"></i>No Vigente
+                </span>
+                        {% endif %}
+                        <br>
+                        <small class="text-muted">
+                            Emisión: {{ estudiante.persona.certificado_celiaco.fecha_emision|date:"d/m/Y" }}
+                            {% if estudiante.persona.certificado_celiaco.fecha_vencimiento %}
+                            | Vence: {{ estudiante.persona.certificado_celiaco.fecha_vencimiento|date:"d/m/Y" }}
+                            {% endif %}
+                        </small>
+                        <br>
+                        <a href="{{ estudiante.persona.certificado_celiaco.archivo_certificado.url }}"
+                           target="_blank"
+                           class="btn btn-outline-primary btn-sm mt-1">
+                            <i class="bi bi-download me-1"></i>Descargar
+                        </a>
+                        {% else %}
+                        <span class="badge bg-secondary">Sin certificado</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                -->
+            </table>
+            <!-- Agregar después del cierre de la tabla de información personal -->
+
+            <hr class="my-3">
+            <div class="row">
+                <div class="col-12">
+                    <h6 class="fw-bold mb-2">
+                        <i class="bi bi-file-earmark-check me-2"></i>
+                        Estado de Validación
+                    </h6>
+                    {% if estudiante.validado_como_regular %}
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        Validado como Alumno Regular
+                    </span>
+                    <br>
+                    <small class="text-muted">
+                        Validado el {{ estudiante.fecha_validacion_regular|date:"d/m/Y H:i" }}
+                        {% if estudiante.validado_por %}
+                        por {{ estudiante.validado_por.get_full_name|default:estudiante.validado_por.username }}
+                        {% endif %}
+                    </small>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        Pendiente de validación
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Becas del estudiante -->
+<div class="content-card mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">
+            <i class="bi bi-award me-2"></i>
+            Becas Asignadas
+        </h5>
+        <a href="{% url 'asignar_beca' estudiante.id %}" class="btn btn-success btn-sm">
+            <i class="bi bi-plus-circle me-1"></i>
+            Asignar Nueva Beca
+        </a>
+    </div>
+
+    {% if becas %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Tipo de Beca</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Estado</th>
+                <th class="text-end">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for beca in becas %}
+            <tr {% if beca.beca.tipo == 'Comedor' %} class="table-success" {% endif %}>
+                <td>
+                    <strong>{{ beca.beca.tipo }}</strong>
+
+                    <!-- Mostrar badge si es beca compuesta (Residencia incluye Comedor) -->
+                    {% if beca.beca.tipo == 'Residencia' %}
+                    <span class="badge bg-info ms-2" title="Esta beca incluye automáticamente beneficio de Comedor">
+                        <i class="bi bi-basket-fill me-1"></i>
+                        Incluye Comedor
+                    </span>
+                    {% endif %}
+
+                    <!-- Mostrar si es beca creada automáticamente -->
+                    {% if beca.beca.tipo == 'Comedor' %}
+                        {% for otra_beca in becas %}
+                            {% if otra_beca.beca.tipo == 'Residencia' and otra_beca.estado_beca in 'ACTIVA,APROBADA,PENDIENTE' %}
+                            <span class="badge bg-secondary ms-2" title="Generada automáticamente por beca Residencia">
+                                        <i class="bi bi-magic me-1"></i>
+                                        Automática
+                                    </span>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if beca.beca.tipo == 'Comedor' and beca.preferencia_menu %}
+                    <br>
+                    <small class="text-muted">
+                        <i class="bi bi-basket-fill me-1"></i>
+                        {{ beca.menu_display }}
+                    </small>
+                    {% endif %}
+
+
+                </td>
+                <td>{{ beca.fecha_inicio|date:"d/m/Y" }}</td>
+                <td>{{ beca.fecha_fin|date:"d/m/Y" }}</td>
+                <td>
+                    {% if beca.estado_beca == 'ACTIVA' %}
+                    <span class="badge bg-success">{{ beca.get_estado_beca_display }}</span>
+                    {% elif beca.estado_beca == 'PENDIENTE' %}
+                    <span class="badge bg-warning text-dark">{{ beca.get_estado_beca_display }}</span>
+                    {% elif beca.estado_beca == 'APROBADA' %}
+                    <span class="badge bg-info">{{ beca.get_estado_beca_display }}</span>
+                    {% elif beca.estado_beca == 'VENCIDA' %}
+                    <span class="badge bg-secondary">{{ beca.get_estado_beca_display }}</span>
+                    {% elif beca.estado_beca == 'SUSPENDIDA' %}
+                    <span class="badge bg-danger">{{ beca.get_estado_beca_display }}</span>
+                    {% else %}
+                    <span class="badge bg-dark">{{ beca.get_estado_beca_display }}</span>
+                    {% endif %}
+                </td>
+
+                <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'editar_beca' beca.id %}"
+                           class="btn btn-outline-primary" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+
+                        <!-- No permitir eliminar beca Comedor si existe Residencia activa -->
+                        {% if beca.beca.tipo == 'Comedor' %}
+                        {% for otra_beca in becas %}
+                        {% if otra_beca.beca.tipo == 'Residencia' and otra_beca.estado_beca in 'ACTIVA,APROBADA' %}
+                        <button class="btn btn-outline-secondary"
+                                title="No se puede eliminar: asociada a Residencia"
+                                disabled>
+                            <i class="bi bi-lock"></i>
+                        </button>
+                        {% else %}
+                        <a href="{% url 'eliminar_beca' beca.id %}"
+                           class="btn btn-outline-danger" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                        {% else %}
+                        <a href="{% url 'eliminar_beca' beca.id %}"
+                           class="btn btn-outline-danger" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Alert informativo sobre becas compuestas -->
+    {% for beca in becas %}
+    {% if beca.beca.tipo == 'Residencia' and beca.estado_beca in 'ACTIVA,APROBADA' %}
+    <div class="alert alert-info mt-3 mb-0">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <strong>Beca Compuesta:</strong> La beca de Residencia incluye automáticamente el beneficio de Comedor gratuito.
+        El estudiante puede acceder al comedor sin costo adicional.
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        Este estudiante no tiene becas asignadas aún
+    </div>
+    {% endif %}
+</div>
+
+<!-- Historial de tickets -->
+<div class="content-card">
+    <h5 class="mb-3">
+        <i class="bi bi-ticket-perforated me-2"></i>
+        Últimos Tickets Comprados
+    </h5>
+
+    {% if tickets %}
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead class="table-light">
+            <tr>
+                <th>Número</th>
+                <th>Menú</th>
+                <th>Precio Base</th>
+                <th>Descuento</th>
+                <th>Precio Pagado</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td><small>{{ ticket.numero_ticket }}</small></td>
+                <td><small>{{ ticket.tipo_menu.nombre }}</small></td>
+                <td><small>${{ ticket.precio_base }}</small></td>
+                <td>
+                    {% if ticket.descuento_aplicado > 0 %}
+                    <small class="text-success">-${{ ticket.descuento_aplicado }}</small>
+                    {% else %}
+                    <small class="text-muted">-</small>
+                    {% endif %}
+                </td>
+                <td>
+                    <small>
+                        {% if ticket.precio_pagado == 0 %}
+                        <strong class="text-success">GRATIS</strong>
+                        {% else %}
+                        <strong>${{ ticket.precio_pagado }}</strong>
+                        {% endif %}
+                    </small>
+                </td>
+                <td><small>{{ ticket.fecha_compra|date:"d/m/Y" }}</small></td>
+                <td>
+                    <small>
+                        {% if ticket.estado == 'pagado' %}
+                        <span class="badge bg-success">Pagado</span>
+                        {% elif ticket.estado == 'usado' %}
+                        <span class="badge bg-secondary">Usado</span>
+                        {% else %}
+                        <span class="badge bg-warning">Pendiente</span>
+                        {% endif %}
+                    </small>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        Este estudiante no ha comprado tickets aún
+    </div>
+    {% endif %}
+</div>
+
+<style>
+      :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}

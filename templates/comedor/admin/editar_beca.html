@@ -1,0 +1,243 @@
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<h3 class="page-title">
+    <i class="bi bi-pencil-square me-2"></i>
+    Editar Beca de {{ estudiante.persona.nombre_completo }}
+</h3>
+
+<div class="content-card">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Información de la beca -->
+    <div class="alert alert-info mb-4">
+        <h5><i class="bi bi-award me-2"></i>{{ persona_beca.beca.tipo }}</h5>
+        <p class="mb-0">
+            <strong>Estado actual:</strong> {{ persona_beca.get_estado_beca_display }}
+        </p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="fecha_inicio" class="form-label fw-bold">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        Fecha de Inicio *
+                    </label>
+                    <input type="date"
+                           name="fecha_inicio"
+                           id="fecha_inicio"
+                           class="form-control"
+                           value="{{ persona_beca.fecha_inicio|date:'Y-m-d' }}"
+                           required>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="fecha_fin" class="form-label fw-bold">
+                        <i class="bi bi-calendar-x me-2"></i>
+                        Fecha de Fin *
+                    </label>
+                    <input type="date"
+                           name="fecha_fin"
+                           id="fecha_fin"
+                           class="form-control"
+                           value="{{ persona_beca.fecha_fin|date:'Y-m-d' }}"
+                           required>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="estado_beca" class="form-label fw-bold">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        Estado de la Beca *
+                    </label>
+                    <select name="estado_beca" id="estado_beca" class="form-select" required>
+                        {% for codigo, nombre in estados_beca %}
+                        <option value="{{ codigo }}" {% if persona_beca.estado_beca == codigo %}selected{% endif %}>
+                            {{ nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- *** NUEVO: Campo preferencia de menú (solo para beca Comedor) *** -->
+            {% if persona_beca.beca.tipo|lower == 'comedor' %}
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="preferencia_menu" class="form-label fw-bold">
+                        <i class="bi bi-basket-fill me-2"></i>
+                        Preferencia de Menú *
+                    </label>
+                    <select name="preferencia_menu" id="preferencia_menu" class="form-select" required>
+                        <option value="">-- Seleccione tipo de menú --</option>
+                        <option value="comun" {% if persona_beca.preferencia_menu == 'comun' %}selected{% endif %}>
+                            Menú Común
+                        </option>
+                        <option value="vegetariano" {% if persona_beca.preferencia_menu == 'vegetariano' %}selected{% endif %}>
+                            Menú Vegetariano
+                        </option>
+                    </select>
+                    <small class="form-text text-muted">
+                        Tipo de menú que recibirá el estudiante con esta beca
+                    </small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sección Certificado Celíaco (solo si es beca de Comedor) -->
+        {% if persona_beca.beca.tipo == 'Comedor' %}
+        <hr class="my-4">
+        <h5 class="mb-3">
+            <i class="bi bi-file-medical me-2"></i>
+            Certificado de Celíaco (Opcional)
+        </h5>
+
+        <div class="alert alert-warning mb-3">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Nota:</strong> El certificado celíaco solo es necesario si el estudiante requiere menú apto para celíacos.
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="requiere_certificado_celiaco"
+                       name="requiere_certificado_celiaco" value="si"
+                       {% if certificado %}checked{% endif %}>
+                <label class="form-check-label fw-bold" for="requiere_certificado_celiaco">
+                    <i class="bi bi-check-circle me-2"></i>
+                    El estudiante requiere menú celíaco
+                </label>
+            </div>
+        </div>
+
+        <div id="formularioCertificado" style="{% if not certificado %}display: none;{% endif %}">
+            {% if certificado %}
+            <div class="alert alert-success mb-3">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong>Certificado existente:</strong>
+                <a href="{{ certificado.archivo_certificado.url }}" target="_blank" class="alert-link">
+                    Ver certificado actualpersona
+                </a>
+                <br>
+                <small>Emitido: {{ certificado.fecha_emision|date:"d/m/Y" }}
+                {% if certificado.fecha_vencimiento %}
+                    - Vence: {{ certificado.fecha_vencimiento|date:"d/m/Y" }}
+                {% endif %}
+                </small>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        {{ certificado_form.archivo_certificado.label_tag }}
+                        {{ certificado_form.archivo_certificado }}
+                        {% if certificado_form.archivo_certificado.errors %}
+                        <div class="text-danger mt-1">{{ certificado_form.archivo_certificado.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">{{ certificado_form.archivo_certificado.help_text }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ certificado_form.fecha_emision.label_tag }}
+                        {{ certificado_form.fecha_emision }}
+                        {% if certificado_form.fecha_emision.errors %}
+                        <div class="text-danger mt-1">{{ certificado_form.fecha_emision.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        {{ certificado_form.fecha_vencimiento.label_tag }}
+                        {{ certificado_form.fecha_vencimiento }}
+                        {% if certificado_form.fecha_vencimiento.errors %}
+                        <div class="text-danger mt-1">{{ certificado_form.fecha_vencimiento.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">{{ certificado_form.fecha_vencimiento.help_text }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            {{ certificado_form.activo }}
+                            {{ certificado_form.activo.label_tag }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="mb-3">
+                        {{ certificado_form.observaciones.label_tag }}
+                        {{ certificado_form.observaciones }}
+                        {% if certificado_form.observaciones.errors %}
+                        <div class="text-danger mt-1">{{ certificado_form.observaciones.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'detalle_beneficiario' estudiante.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle me-2"></i>
+                Guardar Cambios
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxCertificado = document.getElementById('requiere_certificado_celiaco');
+    const formularioCertificado = document.getElementById('formularioCertificado');
+
+    if (checkboxCertificado) {
+        checkboxCertificado.addEventListener('change', function() {
+            formularioCertificado.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+});
+</script>
+
+<style>
+.content-card {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.form-label {
+    color: #34495e;
+}
+</style>
+{% endblock %}

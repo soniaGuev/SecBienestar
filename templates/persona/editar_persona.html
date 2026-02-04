@@ -1,0 +1,367 @@
+{% extends 'persona/panel_persona.html' %}
+{% load static %}
+
+{% block title %}Editar: {{ persona.nombre_completo }}{% endblock %}
+
+{% block admin_content %}
+    <!-- Header -->
+    <div class="mb-4">
+        <a href="{% url 'detalle_persona' persona.id %}" class="btn btn-outline-secondary btn-sm mb-3">
+            <i class="bi bi-arrow-left me-1"></i>
+            Cancelar y Volver
+        </a>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="page-title">
+                <i class="bi bi-pencil-square me-2"></i>
+                Editar: {{ persona.nombre_completo }}
+            </h3>
+        </div>
+    </div>
+
+    <!-- Mensajes de error globales -->
+    {% if form_persona.errors or form_perfil.errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Por favor corrija los errores indicados a continuación.</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- SECCIÓN 1: DATOS DE IDENTIDAD -->
+        <div class="content-card mb-4">
+            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">
+                <i class="bi bi-person-vcard me-2"></i>Datos de Identidad
+            </h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.nombre.label }}</label>
+                    {{ form_persona.nombre }}
+                    <div class="text-danger small">{{ form_persona.nombre.errors }}</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.apellido.label }}</label>
+                    {{ form_persona.apellido }}
+                    <div class="text-danger small">{{ form_persona.apellido.errors }}</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.nombre_percibido.label }}</label>
+                    {{ form_persona.nombre_percibido }}
+                    <div class="text-danger small">{{ form_persona.nombre_percibido.errors }}</div>
+                </div>
+
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        {{ form_persona.nombre_percibido_validado }}
+                        <label class="form-check-label" for="{{ form_persona.nombre_percibido_validado.id_for_label }}">
+                            {{ form_persona.nombre_percibido_validado.label }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                            <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.ddjj_identidad.label }}</label>
+                            {{ form_persona.ddjj_identidad }}
+
+                            {% if persona.ddjj_identidad %}
+                                <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center justify-content-between">
+                                    <small class="text-muted"><i class="bi bi-file-earmark-check me-1"></i> Archivo actual cargado</small>
+                                    <a href="{{ persona.ddjj_identidad.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Ver DDJJ
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="form-text small text-muted">No hay archivo cargado actualmente.</div>
+                            {% endif %}
+
+                            <div class="text-danger small">{{ form_persona.ddjj_identidad.errors }}</div>
+                        </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.tipo_documento.label }}</label>
+                    {{ form_persona.tipo_documento }}
+                    <div class="text-danger small">{{ form_persona.tipo_documento.errors }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">N° Documento</label>
+                    {{ form_persona.documento }}
+                    <div class="text-danger small">{{ form_persona.documento.errors }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.nacionalidad.label }}</label>
+                    {{ form_persona.nacionalidad }}
+                    <div class="text-danger small">{{ form_persona.nacionalidad.errors }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.genero.label }}</label>
+                    {{ form_persona.genero }}
+                    <div class="text-danger small">{{ form_persona.genero.errors }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: CONTACTO Y SISTEMA -->
+        <div class="content-card mb-4">
+            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">
+                <i class="bi bi-geo-alt me-2"></i>Contacto y Sistema
+            </h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.correo.label }}</label>
+                    {{ form_persona.correo }}
+                    <div class="text-danger small">{{ form_persona.correo.errors }}</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.correo_personal.label }}</label>
+                    {{ form_persona.correo_personal }}
+                    <div class="text-danger small">{{ form_persona.correo_personal.errors }}</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.telefono.label }}</label>
+                    {{ form_persona.telefono }}
+                    <div class="text-danger small">{{ form_persona.telefono.errors }}</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.sede.label }}</label>
+                    {{ form_persona.sede }}
+                    <div class="text-danger small">{{ form_persona.sede.errors }}</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.rol.label }}</label>
+                    {{ form_persona.rol }}
+                    <div class="text-danger small">{{ form_persona.rol.errors }}</div>
+                </div>
+            </div>
+
+            <h6 class="fw-bold text-danger mt-4 mb-3"><i class="bi bi-heart-pulse me-2"></i>Contacto de Emergencia</h6>
+            <div class="row g-3 p-3 bg-light rounded-3 border border-light">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.contacto_emergencia_nombre.label }}</label>
+                    {{ form_persona.contacto_emergencia_nombre }}
+                    <div class="text-danger small">{{ form_persona.contacto_emergencia_nombre.errors }}</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-uppercase text-muted">{{ form_persona.contacto_emergencia_telefono.label }}</label>
+                    {{ form_persona.contacto_emergencia_telefono }}
+                    <div class="text-danger small">{{ form_persona.contacto_emergencia_telefono.errors }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: DATOS DE PERFIL (Principal) -->
+        {% if tiene_perfil %}
+        <div class="content-card mb-4">
+            <h5 class="mb-4 text-success fw-bold border-bottom pb-2">
+                <i class="bi bi-briefcase me-2"></i>Datos de {{ nombre_perfil }}
+            </h5>
+
+            <div class="row g-3">
+                {% for field in form_perfil %}
+                    <!-- Excluimos campos especiales que irán en el bloque siguiente (solo estudiantes) -->
+                    {% if persona.rol == 'estudiante' and field.name in 'preferencia_menu,ddjj_celiaco,fecha_vencimiento_ddjj_celiaco,celiaco_validado,validado_como_regular,observaciones_validacion,certificado_regular,fecha_vencimiento_certificado,carta_aceptacion,fecha_vencimiento_carta' %}
+                        <!-- Estos se renderizan abajo -->
+                    {% else %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase text-muted">
+                                {{ field.label }}
+                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+
+                            {% if field.field.widget.input_type == 'checkbox' %}
+                                <div class="form-check mt-1">
+                                    {{ field }}
+                                    <label class="form-check-label text-muted" for="{{ field.id_for_label }}">
+                                        {{ field.help_text|default:"Activar/Desactivar" }}
+                                    </label>
+                                </div>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+
+                            {% if field.help_text and field.field.widget.input_type != 'checkbox' %}
+                                <div class="form-text small">{{ field.help_text }}</div>
+                            {% endif %}
+
+                            <div class="text-danger small">{{ field.errors }}</div>
+                            {% if field.name == 'probatoria_laboral' and perfil_especifico.probatoria_laboral %}
+                                        <div class="mt-2">
+                                            <a href="{{ perfil_especifico.probatoria_laboral.url }}" target="_blank" class="btn btn-sm btn-outline-success w-100">
+                                                <i class="bi bi-file-earmark-text me-2"></i> Ver Probatoria Laboral
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- SECCIÓN 4: GESTIÓN DE MENÚ Y REGULARIDAD (Solo Estudiantes) -->
+
+        {% if persona.rol == 'estudiante' and tiene_perfil %}
+        <div class="content-card mb-4 border">
+            <h5 class="mb-4 text-dark fw-bold border-bottom pb-2">
+                <i class="bi bi-card-checklist me-2"></i>Gestión de Regularidad
+            </h5>
+
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <h6 class="fw-bold text-warning mb-3"><i class="bi bi-shield-check me-2"></i>Validación Regularidad</h6>
+
+                    <div class="form-check mb-3 p-3 bg-white rounded ms-2">
+                        {{ form_perfil.validado_como_regular }}
+                        <label class="form-check-label fw-bold ms-2" for="{{ form_perfil.validado_como_regular.id_for_label }}">
+                            Alumno Regular Validado
+                        </label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Observaciones Validación</label>
+                        {{ form_perfil.observaciones_validacion }}
+                    </div>
+
+                    <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted">Certificado Regular</label>
+                            {{ form_perfil.certificado_regular }}
+                            {% if perfil_especifico.certificado_regular %}
+                                <div class="mt-2">
+                                    <a href="{{ perfil_especifico.certificado_regular.url }}" target="_blank" class="btn btn-sm btn-outline-warning text-dark w-100 border-warning">
+                                        <i class="bi bi-file-earmark-check me-2"></i> Ver Certificado
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted">Vencimiento Certificado</label>
+                            {{ form_perfil.fecha_vencimiento_certificado }}
+                        </div>
+
+                        <!-- ARCHIVO: Carta Aceptación -->
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted">Carta Aceptación (Extranjeros)</label>
+                            {{ form_perfil.carta_aceptacion }}
+                            {% if perfil_especifico.carta_aceptacion %}
+                                <div class="mt-2">
+                                    <a href="{{ perfil_especifico.carta_aceptacion.url }}" target="_blank" class="btn btn-sm btn-outline-dark w-100">
+                                        <i class="bi bi-file-earmark-text me-2"></i> Ver Carta
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted">Vencimiento Carta</label>
+                            {{ form_perfil.fecha_vencimiento_carta }}
+                        </div>
+                </div>
+            </div>
+        </div>
+         {% endif %}
+
+        {% if persona.rol == 'estudiante' and tiene_perfil %}
+        <div class="content-card mb-4 border">
+            <h5 class="mb-4 text-dark fw-bold border-bottom pb-2">
+                <i class="bi bi-card-checklist me-2"></i>Gestión de Menú
+            </h5>
+
+            <div class="row g-4">
+                <!-- Bloque Menú -->
+                <div class="col-md-12 border-end">
+                    <h6 class="fw-bold text-info mb-3"><i class="bi bi-egg-fried me-2"></i>Preferencia de Menú</h6>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Selección de Menú</label>
+                        {{ form_perfil.preferencia_menu }}
+                        <div class="text-danger small">{{ form_perfil.preferencia_menu.errors }}</div>
+                    </div>
+
+                    <div class="p-3 bg-white rounded border">
+                        <h6 class="small fw-bold text-uppercase text-muted mb-2">Documentación Celíaca</h6>
+                        <div class="mb-3">
+                        <label class="form-label small">DDJJ / Certificado</label>
+                        {{ form_perfil.ddjj_celiaco }}
+                        {% if perfil_especifico.ddjj_celiaco %}
+                            <div class="mt-2">
+                                <a href="{{ perfil_especifico.ddjj_celiaco.url }}" target="_blank" class="btn btn-sm btn-outline-info w-100">
+                                    <i class="bi bi-file-medical me-2"></i> Ver Documentación Médica
+                                </a>
+                            </div>
+                        {% endif %}
+                        <div class="text-danger small">{{ form_perfil.ddjj_celiaco.errors }}</div>
+                    </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small">Vencimiento</label>
+                                {{ form_perfil.fecha_vencimiento_ddjj_celiaco }}
+                            </div>
+                            <div class="col-6 d-flex align-items-end">
+                                <div class="form-check mb-2">
+                                    {{ form_perfil.celiaco_validado }}
+                                    <label class="form-check-label small fw-bold" for="{{ form_perfil.celiaco_validado.id_for_label }}">Validado</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bloque Regularidad -->
+
+            </div>
+        </div>
+        {% endif %}
+
+
+
+        <!-- ACCIONES FLOTANTES (Sticky footer) -->
+        <div class=" border-top p-3 d-flex justify-content-end gap-2 ">
+            <a href="{% url 'detalle_persona' persona.id %}" class="btn btn-outline-secondary rounded-pill px-4">
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-success rounded-pill px-5 fw-bold">
+                <i class="bi bi-save me-2"></i>Guardar Cambios
+            </button>
+        </div>
+
+    </form>
+
+<style>
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    /* Ajuste para inputs de fecha */
+    input[type="date"] {
+        position: relative;
+    }
+
+    /* Footer pegajoso para acciones */
+    .sticky-bottom {
+        position: sticky;
+        bottom: 0;
+        z-index: 1020;
+    }
+</style>
+{% endblock %}

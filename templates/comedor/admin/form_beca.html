@@ -1,0 +1,200 @@
+{% extends 'comedor/admin/base_admin.html' %}
+{% load static %}
+
+{% block admin_content %}
+<div class="card shadow border-0 rounded-4 mb-4 overflow-hidden">
+    <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-25">
+            <i class="bi bi-award display-1"></i>
+        </div>
+        <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                 <h2 class="fw-bold mb-1">{{ titulo }}</h2>
+            </div>
+            <a href="{% url 'listar_becas' %}" class="btn btn-outline-light">
+            <i class="bi bi-arrow-left me-2"></i>
+            Volver
+            </a>
+        </div>
+    </div>
+</div>
+<div class="content-card">
+
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                    {{ form.tipo.label }}
+                    <span class="text-danger">*</span>
+                </label>
+                {{ form.tipo }}
+                {% if form.tipo.errors %}
+                    <div class="text-danger small mt-1">{{ form.tipo.errors.0 }}</div>
+                {% endif %}
+                {% if form.tipo.help_text %}
+                    <div class="form-text">{{ form.tipo.help_text }}</div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="form-check">
+                    {{ form.activa }}
+                    <label class="form-check-label" for="{{ form.activa.id_for_label }}">
+                        {{ form.activa.label }}
+                    </label>
+                </div>
+                {% if form.activa.help_text %}
+                    <div class="form-text">{{ form.activa.help_text }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Campos condicionales según el tipo de beca -->
+        <div id="campos-condicionales">
+            <div class="row">
+                <div class="col-md-6 mb-3" id="campo-tiene-monto">
+                    <div class="form-check">
+                        {{ form.tiene_monto }}
+                        <label class="form-check-label" for="{{ form.tiene_monto.id_for_label }}">
+                            {{ form.tiene_monto.label }}
+                        </label>
+                    </div>
+                    {% if form.tiene_monto.help_text %}
+                        <div class="form-text">{{ form.tiene_monto.help_text }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3" id="campo-monto-sugerido">
+                    <label for="{{ form.monto_sugerido.id_for_label }}" class="form-label">
+                        {{ form.monto_sugerido.label }}
+                    </label>
+                    {{ form.monto_sugerido }}
+                    {% if form.monto_sugerido.errors %}
+                        <div class="text-danger small mt-1">{{ form.monto_sugerido.errors.0 }}</div>
+                    {% endif %}
+                    {% if form.monto_sugerido.help_text %}
+                        <div class="form-text">{{ form.monto_sugerido.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3" id="campo-permite-comedor">
+                    <div class="form-check">
+                        {{ form.permite_comedor }}
+                        <label class="form-check-label" for="{{ form.permite_comedor.id_for_label }}">
+                            {{ form.permite_comedor.label }}
+                        </label>
+                    </div>
+                    {% if form.permite_comedor.help_text %}
+                        <div class="form-text">{{ form.permite_comedor.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'listar_becas' %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle me-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle me-2"></i>
+                {{ boton }}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('{{ form.tipo.id_for_label }}');
+    const tieneMonto = document.getElementById('id_tiene_monto');
+    const campoTieneMonto = document.getElementById('campo-tiene-monto');
+    const campoMontoSugerido = document.getElementById('campo-monto-sugerido');
+    const campoPermiteComedor = document.getElementById('campo-permite-comedor');
+    const montoSugeridoInput = document.getElementById('{{ form.monto_sugerido.id_for_label }}');
+    const permiteComedorCheckbox = document.getElementById('{{ form.permite_comedor.id_for_label }}');
+
+    function ajustarCamposSegunTipo() {
+        const tipoSeleccionado = tipoSelect.value;
+
+        // Si es "Comedor", ocultar campos de monto y permite_comedor
+        if (tipoSeleccionado.toLowerCase() === 'comedor') {
+            // Ocultar y desmarcar campos
+            campoTieneMonto.style.display = 'none';
+            campoMontoSugerido.style.display = 'none';
+            campoPermiteComedor.style.display = 'none';
+
+            tieneMonto.checked = false;
+            montoSugeridoInput.value = '';
+            permiteComedorCheckbox.checked = false;
+        } else {
+            // Mostrar todos los campos para otros tipos de beca
+            campoTieneMonto.style.display = 'block';
+            campoPermiteComedor.style.display = 'block';
+
+            // Manejar visibilidad del campo monto_sugerido según tiene_monto
+            toggleMontoSugerido();
+        }
+    }
+
+    function toggleMontoSugerido() {
+        const tipoSeleccionado = tipoSelect.value;
+
+        // Solo mostrar monto_sugerido si no es Comedor Y tiene_monto está marcado
+        if (tipoSeleccionado !== 'Comedor' && tieneMonto.checked) {
+            campoMontoSugerido.style.display = 'block';
+        } else {
+            campoMontoSugerido.style.display = 'none';
+            if (tipoSeleccionado !== 'Comedor') {
+                montoSugeridoInput.value = '';
+            }
+        }
+    }
+
+    // Event listeners
+    tipoSelect.addEventListener('change', ajustarCamposSegunTipo);
+    tieneMonto.addEventListener('change', toggleMontoSugerido);
+
+    // Ejecutar al cargar la página
+    ajustarCamposSegunTipo();
+});
+</script>
+
+<style>
+      :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+</style>
+{% endblock %}

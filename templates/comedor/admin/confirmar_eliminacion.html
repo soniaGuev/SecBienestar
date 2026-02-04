@@ -1,0 +1,73 @@
+<!-- templates/comedor/admin/confirmar_eliminacion.html -->
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<h3 class="page-title text-danger">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    Confirmar Eliminación
+</h3>
+
+<div class="content-card">
+    <div class="alert alert-warning alert-custom">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <img src="{{ imagen.imagen.url }}" alt="{{ imagen.titulo }}" class="img-fluid rounded shadow">
+        </div>
+        <div class="col-md-8">
+            <h4>{{ imagen.titulo }}</h4>
+            {% if imagen.descripcion %}
+            <p class="text-muted">{{ imagen.descripcion }}</p>
+            {% endif %}
+
+            <table class="table table-sm mt-3">
+                <tr
+                    <th width="150">Día:</th>
+                    <td>{{ imagen.get_dia_semana_display|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Estado:</th>
+                    <td>
+                        {% if imagen.activo %}
+                            <span class="badge-custom-active">Activa</span>
+                        {% else %}
+                            <span class="badge-custom-inactive">Inactiva</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Orden:</th>
+                    <td>{{ imagen.orden }}</td>
+                </tr>
+                <tr>
+                    <th>Creada por:</th>
+                    <td>{{ imagen.usuario_creador.get_full_name|default:imagen.usuario_creador.username }}</td>
+                </tr>
+                <tr>
+                    <th>Fecha de creación:</th>
+                    <td>{{ imagen.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'listar_imagenes' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash me-2"></i>
+                Sí, Eliminar Imagen
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

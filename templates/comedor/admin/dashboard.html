@@ -1,0 +1,481 @@
+<!-- templates/comedor/admin/dashboard.html -->
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="card shadow border-0 rounded-4 mb-4 overflow-hidden">
+    <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-25">
+            <i class="bi bi-speedometer2 display-1"></i>
+        </div>
+        <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="fw-bold mb-1">Dashboard</h2>
+                <p class="mb-0 opacity-90">
+                    Panel de Administración - Comedor
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas de Menús -->
+<div class="mb-4">
+    <h5 class="mb-3">
+        <i class="bi bi-clipboard-check me-2"></i>
+        Gestión de Menús
+    </h5>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #6f42c1, #5a32a3);">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ total_menus }}</div>
+                        <div class="stat-label">Total de Menús</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ menus_activos }}</div>
+                        <div class="stat-label">Menús Disponibles</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #ffc107, #ff9800);">
+                        <i class="bi bi-pause-circle"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ menus_inactivos }}</div>
+                        <div class="stat-label">Menús Inactivos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas de Beneficios -->
+<div class="mb-4">
+    <h5 class="mb-3">
+        <i class="bi bi-gift me-2"></i>
+        Beneficios de Becas
+    </h5>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #fd7e14, #e8590c);">
+                        <i class="bi bi-gift"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ total_beneficios }}</div>
+                        <div class="stat-label">Total de Beneficios</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ beneficios_activos }}</div>
+                        <div class="stat-label">Beneficios Activos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #17a2b8, #138496);">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ beneficios_gratuitos }}</div>
+                        <div class="stat-label">Accesos Gratuitos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #6c757d, #5a6268);">
+                        <i class="bi bi-pause-circle"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ beneficios_inactivos }}</div>
+                        <div class="stat-label">Beneficios Inactivos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actividades del Panel -->
+<div class="mb-4">
+    <h5 class="mb-3">
+        <i class="bi bi-bar-chart-steps me-2"></i>
+        Actividades
+    </h5>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7);">
+                        <i class="bi bi-egg-fried"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ menus_comunes }}</div>
+                        <div class="stat-label">Menús Comunes Comprados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #20c997, #17a2b8);">
+                        <i class="bi bi-leaf"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ menus_vegetarianos }}</div>
+                        <div class="stat-label">Menús Vegetarianos Comprados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #ffc107, #fd7e14);">
+                        <i class="bi bi-shield-plus"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ menus_celiacos }}</div>
+                        <div class="stat-label">Menús Celíacos Comprados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #198754, #0f5132);">
+                        <i class="bi bi-percent"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ descuentos_becados }}</div>
+                        <div class="stat-label">Descuentos a Becados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #6c757d, #495057);">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ descuentos_no_docente }}</div>
+                        <div class="stat-label">Descuentos Personal No Docente</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #6610f2, #520dc2);">
+                        <i class="bi bi-mortarboard"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="stat-value">{{ descuentos_estudiantes }}</div>
+                        <div class="stat-label">Descuentos Estudiantes Comunes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const actividadesSection = document.getElementById('actividades');
+
+        if (!actividadesSection) return;
+
+        const toggleActividadesVisibility = () => {
+            if (window.location.hash === '#actividades') {
+                actividadesSection.classList.remove('d-none');
+                actividadesSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+            } else {
+                actividadesSection.classList.add('d-none');
+            }
+        };
+
+        toggleActividadesVisibility();
+        window.addEventListener('hashchange', toggleActividadesVisibility);
+    });
+</script>
+<!-- Estadísticas de Beneficiarios -->
+<div class="mb-4">
+    <h5 class="mb-3">
+        <i class="bi bi-people me-2"></i>
+        Beneficiarios
+    </h5>
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">
+                                <i class="bi bi-people me-2"></i>
+                                Gestión de Estudiantes con Becas
+                            </h6>
+                            <p class="text-muted mb-0">
+                                Administra las becas asignadas a los estudiantes
+                            </p>
+                        </div>
+                        <a href="{% url 'listar_beneficiarios' %}" class="btn btn-primary">
+                            <i class="bi bi-people me-2"></i>
+                            Ver Beneficiarios
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accesos Rápidos -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="content-card">
+            <h5 class="mb-4">
+                <i class="bi bi-lightning-charge me-2"></i>
+                Accesos Rápidos
+            </h5>
+            <div class="row">
+                <!-- Carrusel -->
+
+
+                <!-- Menús -->
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-clipboard-check me-2"></i>
+                                Gestión de Menús
+                            </h6>
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="{% url 'crear_menu' %}" class="btn btn-success">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Crear Nuevo Menú
+                                </a>
+                                <a href="{% url 'listar_menus' %}" class="btn btn-outline-success">
+                                    <i class="bi bi-list-ul me-2"></i>
+                                    Ver Todos los Menús
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-gift me-2"></i>
+                                Beneficios de Becas
+                            </h6>
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="{% url 'crear_beneficio' %}" class="btn btn-warning">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Crear Nuevo Beneficio
+                                </a>
+                                <a href="{% url 'listar_beneficios' %}" class="btn btn-outline-warning">
+                                    <i class="bi bi-list-ul me-2"></i>
+                                    Ver Todos los Beneficios
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-gift me-2"></i>
+                                Gestion de Becas
+                            </h6>
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="{% url 'crear_beca_catalogo' %}" class="btn btn-warning">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Crear Nuevo Beneficio
+                                </a>
+                                <a href="{% url 'listar_becas' %}" class="btn btn-outline-warning">
+                                    <i class="bi bi-list-ul me-2"></i>
+                                    Ver Todos los Beneficios
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Guía Rápida -->
+<div class="row mt-4">
+
+    <div class="col-md-4">
+        <div class="content-card">
+            <h5 class="mb-3">
+                <i class="bi bi-lightbulb me-2"></i>
+                Guía de Menús
+            </h5>
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <i class="bi bi-check2 text-success me-2"></i>
+                    Los menús <strong>activos</strong> están disponibles para compra
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check2 text-success me-2"></i>
+                    Cada tipo de menú tiene un precio independiente
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check2 text-success me-2"></i>
+                    Puedes crear menús: Común, Vegetariano y Celíaco
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check2 text-success me-2"></i>
+                    Los cambios se reflejan inmediatamente en la tienda
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="content-card">
+            <h5 class="mb-3">
+                <i class="bi bi-lightbulb me-2"></i>
+                Guía de Beneficios
+            </h5>
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <i class="bi bi-check2 text-success me-2"></i>
+                    Los beneficios <strong>activos</strong> se aplican automáticamente
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check2 text-success me-2"></i>
+                    El tipo de beca debe coincidir exactamente con el sistema
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check2 text-success me-2"></i>
+                    100% de descuento = <strong>Acceso gratuito</strong>
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check2 text-success me-2"></i>
+                    Los cambios aplican a nuevas compras solamente
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 24px;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}

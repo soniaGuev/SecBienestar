@@ -1,0 +1,216 @@
+{% extends 'bienestar_layout/base_bienestar.html' %}
+{% load static %}
+
+{% block title %}Generar Ticket Gratuito{% endblock %}
+
+{% block content %}
+<div class="generate-free-wrapper py-5">
+    <div class="container">
+
+        <!-- Botón Volver -->
+        <div class="mb-4">
+            <a href="{% url 'mis_tickets' %}" class="btn btn-link text-decoration-none text-muted p-0 fw-semibold">
+                <i class="bi bi-arrow-left me-2"></i>Volver a mis tickets
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-9 col-lg-11">
+
+                <!-- Tarjeta Principal -->
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+                    <!-- Encabezado Visual (Idéntico a Comprar, icono de regalo) -->
+                    <div class="header-gradient p-5 text-center text-white position-relative overflow-hidden">
+                        <div class="position-relative z-2">
+                            <div class="icon-box bg-white text-success rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                                <i class="bi bi-gift-fill"></i>
+                            </div>
+                            <h2 class="fw-bold mb-2">Generar Ticket Gratuito</h2>
+                            <p class="opacity-90 fs-5 mb-0">Tu beneficio de beca activo</p>
+                        </div>
+
+                        <!-- Decoración de fondo -->
+                        <div class="decoration-circle circle-1"></div>
+                        <div class="decoration-circle circle-2"></div>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <!-- SECCIÓN 1: Información de la Beca (Estilo Beneficio Activo de Comprar) -->
+                        <div class="bg-success bg-opacity-10 rounded-3 p-4 mb-5 border border-success border-opacity-25 position-relative overflow-hidden">
+                            <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                                <i class="bi bi-award-fill display-1 text-success"></i>
+                            </div>
+                            <div class="d-flex align-items-start position-relative z-1">
+                                <i class="bi bi-check-circle-fill text-success fs-3 me-3 mt-1"></i>
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-1">Beca Activa Detectada</h5>
+                                    <p class="text-muted mb-2 small">
+                                        Tienes un beneficio vigente que te permite acceder al comedor sin costo.
+                                    </p>
+
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        <span class="badge bg-success text-white px-3 py-2 rounded-pill shadow-sm">
+                                            <i class="bi bi-star-fill me-1"></i> {{ beca_activa.beca.tipo }}
+                                        </span>
+                                        <span class="badge bg-white text-success border border-success px-3 py-2 rounded-pill">
+                                            <i class="bi bi-calendar3 me-1"></i> Vigencia: {{ beca_activa.fecha_fin|date:"d/m/Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 2: Menú Asignado (Estilo Card de Comprar) -->
+                        <h6 class="text-uppercase text-muted fw-bold small mb-4 ls-1 border-bottom pb-2">
+                            Menú Asignado
+                        </h6>
+
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <!-- CARD MENÚ (INLINE) -->
+                                <div class="card h-100 border rounded-4 menu-card-item overflow-hidden shadow-sm hover-effect">
+                                    <div class="card-body p-4 d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <span class="badge bg-primary-custom bg-opacity-10 text-dark border border-opacity-25">
+                                                <i class="bi bi-check2-circle me-1"></i> Selección Automática
+                                            </span>
+                                        </div>
+                                        <h4 class="fw-bold mb-2 text-dark">{{ tipo_menu.nombre }}</h4>
+                                        <p class="text-muted mb-4 small flex-grow-1">{{ tipo_menu.descripcion }}</p>
+
+                                        <div class="d-flex align-items-end justify-content-between mt-auto pt-3 border-top">
+                                            <div>
+                                                <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Tu Costo</small>
+                                                <span class="text-decoration-line-through text-muted small me-1">${{ tipo_menu.precio }}</span>
+                                                <span class="fw-bold fs-4 text-success">$0.00</span>
+                                            </div>
+                                            <!-- Icono decorativo según preferencia -->
+                                            {% if 'vegetariano' in estudiante.get_preferencia_menu_display|lower %}
+                                                <i class="bi bi-flower1 text-success opacity-25" style="font-size: 2.5rem;"></i>
+                                            {% else %}
+                                                <i class="bi bi-cup-hot text-primary-custom opacity-25" style="font-size: 2.5rem;"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 3: Formulario de Confirmación (Estilo Bloque Gris de Comprar) -->
+                        <div class="bg-light rounded-4 p-4 p-md-5 border">
+                            <h4 class="fw-bold mb-4 text-dark">
+                                <i class="bi bi-qr-code-scan me-2 text-primary-custom"></i>Generar Ticket
+                            </h4>
+
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <!-- Input oculto o readonly para cantidad -->
+                                <input type="hidden" name="cantidad" value="1">
+
+                                <div class="row align-items-center g-4">
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-muted small text-uppercase fw-bold me-2">Resumen:</span>
+                                            <span class="badge bg-dark">1 Ticket</span>
+                                        </div>
+
+                                        <div class="fs-5 mb-2">
+                                            {{ tipo_menu.nombre }}
+                                        </div>
+
+                                        <!-- Preferencia de Menú del Estudiante -->
+                                        <div class="small text-muted">
+                                            <i class="bi bi-person-lines-fill me-1"></i>
+                                            Preferencia: <strong>{{ estudiante.get_preferencia_menu_display }}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 text-md-end">
+                                        <button type="submit" class="btn btn-primary-custom btn-lg rounded-pill shadow-sm fw-bold px-4 w-100">
+                                            <i class="bi bi-check-lg me-2"></i>Confirmar
+                                        </button>
+                                        <a href="{% url 'mis_tickets' %}" class="btn btn-link text-muted text-decoration-none mt-2 d-inline-block small">
+                                            Cancelar
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-top text-center text-md-start">
+                                    <p class="text-muted small mb-0">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        El ticket se guardará automáticamente en <a href="{% url 'mis_tickets' %}" class="text-success fw-bold text-decoration-none">Mis Tickets</a>.
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+        --accent-custom: #f9a826;
+    }
+
+    .generate-free-wrapper {
+        min-height: 90vh;
+        background-color: #f4f7f6;
+        background-image: radial-gradient(#e9ecef 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    /* Header Gradient */
+    .header-gradient {
+        background: linear-gradient(135deg, #28a745 0%, var(--primary-custom) 100%);
+    }
+
+    /* Decoraciones Fondo */
+    .decoration-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 1;
+    }
+    .circle-1 { width: 300px; height: 300px; top: -100px; right: -50px; }
+    .circle-2 { width: 150px; height: 150px; bottom: -20px; left: -20px; }
+
+    .z-1 { z-index: 1; }
+    .z-2 { z-index: 2; }
+    .ls-1 { letter-spacing: 1px; }
+
+    /* Efectos de la tarjeta de menú */
+    .hover-effect {
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .hover-effect:hover {
+        transform: translateY(-3px);
+        border-color: var(--primary-custom) !important;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Botón Principal */
+    .btn-primary-custom {
+        background-color: var(--primary-custom);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(44, 125, 75, 0.3) !important;
+        color: white;
+    }
+</style>
+{% endblock %}

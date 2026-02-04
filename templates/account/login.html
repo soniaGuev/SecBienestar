@@ -1,0 +1,299 @@
+{% extends "bienestar_layout/base_bienestar.html" %}
+{% load static %}
+
+{% block content %}
+<div class="login-page-wrapper d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <div class="card shadow-lg overflow-hidden border-0 rounded-4 m-5">
+                    <div class="row g-0">
+
+                        <!-- Sección Izquierda: Formulario -->
+                        <div class="col-lg-7 bg-white p-5 position-relative">
+                            <div class="login-content">
+                                <div class="mb-5">
+                                    <h2 class="fw-bold text-dark mb-2">¡Hola de nuevo!</h2>
+                                    <p class="text-muted">Ingresa tus credenciales para continuar.</p>
+                                </div>
+
+                                <form method="post" class="needs-validation" novalidate>
+                                    {% csrf_token %}
+
+                                    {% if form.non_field_errors %}
+                                        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                                                <div>
+                                                    {% for error in form.non_field_errors %}
+                                                        {{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    {% endif %}
+
+                                    {% for field in form %}
+                                        <div class="mb-4 position-relative field-container">
+                                            <label for="{{ field.id_for_label }}" class="form-label small text-uppercase fw-bold text-secondary" style="font-size: 0.75rem; letter-spacing: 1px;">
+                                                {{ field.label }}
+                                            </label>
+
+                                            <div class="input-group">
+                                                <!-- Lógica simple para iconos basados en el tipo de input -->
+                                                <span class="input-group-text bg-light border-end-0 text-muted ps-3">
+                                                    {% if 'password' in field.field.widget.input_type %}
+                                                        <i class="bi bi-lock"></i>
+                                                    {% elif 'checkbox' in field.field.widget.input_type %}
+                                                        <i class="bi bi-check-square"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-person"></i>
+                                                    {% endif %}
+                                                </span>
+
+                                                {% if field.field.widget.input_type == 'checkbox' %}
+                                                    <div class="form-control bg-light d-flex align-items-center border-start-0">
+                                                        <div class="form-check mb-0">
+                                                            {{ field }}
+                                                            <label class="form-check-label ms-2" for="{{ field.id_for_label }}">
+                                                                {{ field.label }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <input type="{{ field.field.widget.input_type }}"
+                                                           name="{{ field.name }}"
+                                                           id="{{ field.id_for_label }}"
+                                                           class="form-control bg-light border-start-0 py-3 ps-2 {% if field.errors %}is-invalid{% endif %}"
+                                                           value="{{ field.value|default:'' }}"
+                                                           {% if field.field.required %}required{% endif %}
+                                                           placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}">
+
+                                                    <!-- Botón ojo para passwords -->
+                                                    {% if 'password' in field.field.widget.input_type %}
+                                                    <button class="btn btn-light border border-start-0 text-muted" type="button" onclick="togglePassword(this, '{{ field.id_for_label }}')">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+
+                                            {% if field.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in field.errors %}
+                                                        <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            {% if field.help_text %}
+                                                <div class="form-text small">{{ field.help_text }}</div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+
+                                    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+                                        <a href="{% url 'account_reset_password' %}" class="text-decoration-none small fw-semibold text-primary-custom">
+                                            ¿Olvidaste tu contraseña?
+                                        </a>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button class="btn btn-primary-custom btn-lg py-3 fw-bold shadow-sm" type="submit">
+                                            Ingresar <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Sección Derecha: Bienvenida / Registro -->
+                        <div class="col-lg-5 d-none d-lg-block position-relative overflow-hidden">
+                            <div class="h-100 bg-gradient-custom p-5 text-white d-flex flex-column justify-content-center align-items-center text-center position-relative z-1">
+                                <!-- Elementos decorativos de fondo -->
+                                <div class="decoration-circle circle-1"></div>
+                                <div class="decoration-circle circle-2"></div>
+
+                                <div class="mb-4 animate-up">
+                                    <div class="icon-box bg-white bg-opacity-10 rounded-circle mb-4 mx-auto d-flex align-items-center justify-content-center backdrop-blur">
+                                        <i class="bi bi-stars fs-1"></i>
+                                    </div>
+                                    <h2 class="fw-bold display-6 mb-3">¡Únete a Bienestar!</h2>
+                                    <p class="lead opacity-75 mb-4 fs-6">
+                                        Descubre un espacio diseñado para tu desarrollo y comodidad. Gestiona tus reservas y accede a beneficios exclusivos.
+                                    </p>
+                                </div>
+
+                                <div class="animate-up delay-100">
+                                    {% url 'signup' as signup_url %}
+                                    <a href="{{ signup_url|default:'/accounts/signup/' }}" class="btn btn-outline-light btn-lg px-5 py-2 fw-bold rounded-pill btn-register-custom">
+                                        Crear Cuenta
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        /* Ajusta estos colores según tu marca, he puesto unos modernos por defecto */
+        --primary-custom: var(--primary-color, #2C7D4B);
+        --primary-dark: #1e5c35;
+        --accent-custom: var(--accent-color, #f9a826);
+    }
+
+    .login-page-wrapper {
+        min-height: 85vh;
+        background-color: #f4f7f6;
+        background-image:
+            radial-gradient(at 0% 0%, rgba(44, 125, 75, 0.05) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(249, 168, 38, 0.05) 0px, transparent 50%);
+    }
+
+    /* Inputs Styling */
+    .form-control, .input-group-text, .btn-light {
+        border-color: #eee;
+        transition: all 0.3s ease;
+    }
+
+    .input-group:focus-within .form-control,
+    .input-group:focus-within .input-group-text,
+    .input-group:focus-within .btn-light {
+        border-color: var(--primary-custom);
+        background-color: #fff;
+    }
+
+    .input-group:focus-within .input-group-text i {
+        color: var(--primary-custom);
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+    }
+
+    /* Button Styling */
+    .btn-primary-custom {
+        background-color: var(--primary-custom);
+        border: none;
+        color: white;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(44, 125, 75, 0.2) !important;
+        color: white;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom);
+    }
+
+    .text-primary-custom:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    /* Right Panel Gradient */
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, #1a5235 100%);
+    }
+
+    /* Decorations */
+    .decoration-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: -1;
+    }
+
+    .circle-1 {
+        width: 300px;
+        height: 300px;
+        top: -100px;
+        right: -100px;
+    }
+
+    .circle-2 {
+        width: 200px;
+        height: 200px;
+        bottom: -50px;
+        left: -50px;
+    }
+
+    .backdrop-blur {
+        backdrop-filter: blur(5px);
+        width: 80px;
+        height: 80px;
+    }
+
+    .icon-box i {
+        color: rgba(255,255,255, 0.9);
+    }
+
+    /* Animations */
+    .animate-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .delay-100 {
+        animation-delay: 0.2s;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Botón Mostrar Password */
+    .input-group .btn-light:hover {
+        background-color: #e9ecef;
+        border-color: #eee;
+    }
+
+    .btn-register-custom {
+        transition: all 0.3s ease;
+        border-width: 2px;
+    }
+
+    .btn-register-custom:hover {
+        background-color: var(--accent-custom) !important;
+        border-color: var(--accent-custom) !important;
+        color: white !important;
+        transform: translateY(-3px) scale(1.02);
+    }
+
+</style>
+
+<script>
+    function togglePassword(btn, inputId) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+</script>
+
+<!-- Asegurar que Bootstrap Icons esté presente -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock content %}

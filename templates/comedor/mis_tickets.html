@@ -1,0 +1,240 @@
+{% extends 'bienestar_layout/base_bienestar.html' %}
+{% load static %}
+
+{% block title %}Mis Tickets{% endblock %}
+
+{% block content %}
+<div class="tickets-page-wrapper py-5">
+    <div class="container">
+
+        <!-- Encabezado con Acción Principal -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5">
+            <div class="mb-3 mb-md-0">
+                <h2 class="fw-bold text-dark mb-1">
+                    <i class="bi bi-ticket-perforated-fill me-2 text-primary-custom"></i>Mis Tickets
+                </h2>
+                <p class="text-muted mb-0">Gestiona tus compras y reservas de comedor.</p>
+            </div>
+            <a href="{% url 'comprar_tickets' %}" class="btn btn-primary-custom rounded-pill px-4 py-2 shadow-sm fw-bold">
+                <i class="bi bi-plus-lg me-2"></i>Comprar Nuevo
+            </a>
+        </div>
+
+        {% if tickets %}
+            <!-- Vista de Escritorio: Tabla Moderna -->
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden d-none d-lg-block">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="py-3 ps-4 text-uppercase text-muted small fw-bold">Ticket</th>
+                                <th class="py-3 text-uppercase text-muted small fw-bold">Menú</th>
+                                <th class="py-3 text-uppercase text-muted small fw-bold">Estado</th>
+                                <th class="py-3 text-uppercase text-muted small fw-bold">Vencimiento</th>
+                                <th class="py-3 text-uppercase text-muted small fw-bold">Precio</th>
+                                <th class="py-3 text-end pe-4 text-uppercase text-muted small fw-bold">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="ticket-icon bg-light rounded-circle p-2 me-3 text-primary-custom">
+                                            <i class="bi bi-qr-code"></i>
+                                        </div>
+                                        <div>
+                                            <span class="d-block fw-bold text-dark">#{{ ticket.numero_ticket }}</span>
+                                            <small class="text-muted">{{ ticket.fecha_compra|date:"d/m/Y" }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">{{ ticket.tipo_menu.nombre }}</span>
+                                    {% if ticket.requiere_menu_celiaco %}
+                                        <span class="badge bg-warning text-dark ms-2" title="Menú Celíaco">
+                                            <i class="bi bi-patch-check-fill"></i> Celíaco
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <!-- Lógica de colores para estados -->
+                                    {% if ticket.estado == 'VALIDO' or ticket.estado == 'PAGADO' %}
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
+                                            <i class="bi bi-check-circle me-1"></i> {{ ticket.get_estado_display }}
+                                        </span>
+                                    {% elif ticket.estado == 'USADO' %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill">
+                                            <i class="bi bi-check-all me-1"></i> {{ ticket.get_estado_display }}
+                                        </span>
+                                    {% elif ticket.estado == 'VENCIDO' %}
+                                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">
+                                            <i class="bi bi-x-circle me-1"></i> {{ ticket.get_estado_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">
+                                            {{ ticket.get_estado_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="text-dark">{{ ticket.fecha_valido_hasta|date:"d/m/Y" }}</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-dark">${{ ticket.precio_pagado }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'detalle_ticket' ticket.id %}" class="btn btn-sm btn-outline-dark rounded-pill px-3">
+                                        Ver Detalle
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vista Móvil: Tarjetas (Cards) -->
+            <div class="row g-3 d-lg-none">
+                {% for ticket in tickets %}
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 rounded-4 h-100 position-relative overflow-hidden ticket-card-mobile">
+                        <!-- Borde lateral de color según estado -->
+                        <div class="status-border
+                            {% if ticket.estado == 'VALIDO' %}bg-success
+                            {% elif ticket.estado == 'USADO' %}bg-secondary
+                            {% elif ticket.estado == 'VENCIDO' %}bg-danger
+                            {% else %}bg-warning{% endif %}">
+                        </div>
+
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="badge bg-light text-dark border mb-2">#{{ ticket.numero_ticket }}</span>
+                                    <h5 class="fw-bold mb-0">{{ ticket.tipo_menu.nombre }}</h5>
+                                </div>
+                                <div class="text-end">
+                                    <span class="fw-bold fs-5 text-primary-custom">${{ ticket.precio_pagado }}</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                {% if ticket.requiere_menu_celiaco %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-patch-check-fill me-1"></i>Celíaco</span>
+                                {% endif %}
+
+                                {% if ticket.estado == 'VALIDO' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success"><i class="bi bi-check-circle me-1"></i>Válido</span>
+                                {% elif ticket.estado == 'USADO' %}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Usado</span>
+                                {% elif ticket.estado == 'VENCIDO' %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger">Vencido</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex align-items-center text-muted small mb-3">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                Vence: {{ ticket.fecha_valido_hasta|date:"d/m/Y" }}
+                            </div>
+
+                            <div class="d-grid">
+                                <a href="{% url 'detalle_ticket' ticket.id %}" class="btn btn-outline-primary-custom rounded-pill">
+                                    Ver Detalle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Estado Vacío (Empty State) -->
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                        <i class="bi bi-ticket-detailed text-muted opacity-25" style="font-size: 4rem;"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold text-dark">No tienes tickets disponibles</h4>
+                <p class="text-muted mb-4">Aún no has realizado ninguna compra de tickets de comedor.</p>
+                <a href="{% url 'comprar_tickets' %}" class="btn btn-primary-custom rounded-pill px-5 py-3 shadow-sm fw-bold">
+                    Comprar mi primer ticket
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .tickets-page-wrapper {
+        min-height: 80vh;
+        background-color: #f8f9fa;
+        background-image: radial-gradient(#e9ecef 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    /* Botones Personalizados */
+    .btn-primary-custom {
+        background-color: var(--primary-custom);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(44, 125, 75, 0.3) !important;
+        color: white;
+    }
+
+    .btn-outline-primary-custom {
+        color: var(--primary-custom);
+        border: 1px solid var(--primary-custom);
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .btn-outline-primary-custom:hover {
+        background-color: var(--primary-custom);
+        color: white;
+    }
+
+    /* Icono en tabla */
+    .ticket-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Tabla Styles */
+    .table-hover tbody tr:hover {
+        background-color: rgba(44, 125, 75, 0.02);
+    }
+
+    /* Card Mobile Styles */
+    .ticket-card-mobile {
+        transition: transform 0.2s;
+    }
+    .ticket-card-mobile:active {
+        transform: scale(0.98);
+    }
+    .status-border {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 6px;
+    }
+</style>
+{% endblock %}

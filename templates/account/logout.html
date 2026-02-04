@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load materializecss %}
+{% load static %}
+
+{% block content %}
+<div class="center container">
+  <div class="col s12 m6">
+    <h4 class="text-darken-3">¿Desea salir?</h4>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn bnt-large indigo waves-effect" type="submit">Cerrar sesión</button>
+    </form>
+  </div>
+</div>
+
+{% endblock content %}

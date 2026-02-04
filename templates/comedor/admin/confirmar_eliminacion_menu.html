@@ -1,0 +1,108 @@
+<!-- templates/comedor/admin/confirmar_eliminacion_menu.html -->
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<h3 class="page-title">
+    <i class="bi bi-exclamation-triangle me-2 text-danger"></i>
+    Confirmar Eliminación
+</h3>
+
+<div class="content-card">
+    <div class="alert alert-danger d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-3" style="font-size: 2rem;"></i>
+        <div>
+            <h5 class="mb-1">¿Estás seguro de eliminar este menú?</h5>
+            <p class="mb-0">Esta acción no se puede deshacer.</p>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="badge badge-tipo badge-{{ menu.tipo }} mb-2">
+                        {{ menu.get_tipo_display }}
+                    </span>
+                    <h5 class="card-title">{{ menu.nombre }}</h5>
+                    <p class="card-text text-muted">{{ menu.descripcion|truncatewords:20 }}</p>
+                </div>
+                <div class="text-end">
+                    <div class="precio-grande">
+                        ${{ menu.precio }}
+                    </div>
+                    {% if menu.activo %}
+                        <span class="badge bg-success mt-2">Activo</span>
+                    {% else %}
+                        <span class="badge bg-secondary mt-2">Inactivo</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-warning mt-4">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Advertencia:</strong> Si este menú tiene tickets asociados, no podrá ser eliminado.
+        En ese caso, considera desactivarlo en lugar de eliminarlo.
+    </div>
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'listar_menus' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash me-2"></i>
+                Sí, Eliminar Menú
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.content-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.badge-tipo {
+    font-size: 0.85em;
+    padding: 6px 12px;
+    font-weight: 500;
+}
+
+.badge-comun {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.badge-vegetariano {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.badge-celiaco {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: white;
+}
+
+.precio-grande {
+    font-size: 2rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+</style>
+{% endblock %}

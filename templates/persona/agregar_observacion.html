@@ -1,0 +1,139 @@
+{% extends 'persona/panel_persona.html' %}
+{% load static %}
+
+{% block title %}Agregar Observación - {{ persona.nombre_completo }}{% endblock %}
+
+{% block admin_content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1"><i class="bi bi-chat-left-text"></i> Agregar Observación</h2>
+                    <p class="text-muted mb-0">{{ persona.nombre_completo }}</p>
+                </div>
+                <a href="{% url 'detalle_persona' persona.id %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+
+            <!-- Mensajes -->
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Información de la Persona -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-badge"></i> Información de la Persona</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <strong>Nombre:</strong>
+                            <p class="mb-0 text-muted">{{ persona.nombre_completo }}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Documento:</strong>
+                            <p class="mb-0 text-muted">{{ persona.get_tipo_documento_display }} {{ persona.documento }}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Rol:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-primary">{{ persona.get_rol_display }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Correo:</strong>
+                            <p class="mb-0 text-muted">{{ persona.correo }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Observación -->
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Nueva Observación</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="{{ form.observacion.id_for_label }}" class="form-label">
+                                <strong>{{ form.observacion.label }}</strong>
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.observacion }}
+                            {% if form.observacion.errors %}
+                            <div class="text-danger small mt-1">{{ form.observacion.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Describa la observación de forma clara y detallada. Esta información quedará registrada en el historial de la persona.
+                            </small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Información</h6>
+                            <ul class="mb-0 small">
+                                <li>Las observaciones son visibles para todos los administradores del comedor</li>
+                                <li>Quedará registrado tu nombre de usuario y la fecha/hora exacta</li>
+                                <li>Esta observación aparecerá en el historial de la persona</li>
+                                <li>Se recomienda ser objetivo y profesional en las observaciones</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'detalle_persona' persona.id %}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle"></i> Guardar Observación
+                    </button>
+                </div>
+            </form>
+
+            <!-- Últimas Observaciones -->
+            {% if persona.observacion_set.all %}
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Observaciones</h5>
+                </div>
+                <div class="card-body">
+                    {% for obs in persona.observacion_set.all|slice:":5" %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3"></i> {{ obs.fecha|date:"d/m/Y H:i" }}
+                            </small>
+                            <span class="badge
+                                {% if obs.tipo_accion == 'creacion' %}bg-success
+                                {% elif obs.tipo_accion == 'modificacion' %}bg-primary
+                                {% elif obs.tipo_accion == 'eliminacion' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ obs.get_tipo_accion_display }}
+                            </span>
+                        </div>
+                        <p class="mb-1">{{ obs.observacion }}</p>
+                        <small class="text-muted">
+                            <i class="bi bi-person"></i> Por: {{ obs.usuario.get_full_name|default:obs.usuario.username }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

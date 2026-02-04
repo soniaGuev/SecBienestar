@@ -1,0 +1,507 @@
+{% extends "bienestar_layout/base_bienestar.html" %}
+{% load static %}
+
+{% block content %}
+<div class="profile-page-wrapper d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+                    <!-- Header del Card -->
+                    <div class="card-header bg-white border-0 pt-4 px-5 pb-0">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bold text-dark mb-1">Completa tu Perfil</h3>
+                                <p class="text-muted small mb-0">
+                                    <span class="badge bg-primary-custom me-2">{{ rol_display }}</span>
+                                    Completa la información necesaria para tu perfil
+                                </p>
+                            </div>
+                            <div class="text-end">
+                                <i class="bi bi-person-circle fs-1 text-primary-custom"></i>
+                            </div>
+                        </div>
+                        <hr class="opacity-10 mt-3">
+                    </div>
+
+                    <div class="card-body p-0">
+                        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {% csrf_token %}
+
+                            <!-- Accordion para organizar secciones -->
+                            <div class="accordion accordion-flush mx-5" id="profileAccordion">
+
+                                <!-- SECCIÓN 1: Datos Personales Básicos -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button bg-light-subtle" type="button" data-bs-toggle="collapse" data-bs-target="#datosBasicos" aria-expanded="true">
+                                            <i class="bi bi-person-vcard me-2 text-primary-custom fs-5"></i>
+                                            <strong>Datos Personales Básicos</strong>
+                                            <span class="badge bg-danger ms-2">Requerido</span>
+                                        </button>
+                                    </h2>
+                                    <div id="datosBasicos" class="accordion-collapse collapse show" data-bs-parent="#profileAccordion">
+                                        <div class="accordion-body p-5">
+                                            <div class="row">
+                                                {% for field in form_base %}
+                                                    {% if field.name != 'nombre_percibido' and field.name != 'ddjj_identidad' %}
+                                                        <div class="col-md-6 mb-4">
+                                                            <label for="{{ field.id_for_label }}" class="form-label small text-uppercase fw-bold text-secondary" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                                                {{ field.label }}
+                                                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                                            </label>
+
+                                                            {% if field.name == 'genero' or field.name == 'tipo_documento' or field.name == 'sede' %}
+                                                                {{ field }}
+                                                            {% elif field.name == 'email' %}
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                                                        <i class="bi bi-envelope"></i>
+                                                                    </span>
+                                                                    {{ field }}
+                                                                </div>
+                                                                <div class="form-text small opacity-75">
+                                                                    <i class="bi bi-info-circle me-1"></i>
+                                                                    Este es el correo con el que iniciaste sesión
+                                                                </div>
+                                                            {% else %}
+                                                           <div class="input-group">
+                                                                    <span class="input-group-text bg-white border-end-0 text-muted">
+                                                                        {% if 'nombre' in field.name or 'apellido' in field.name %}
+                                                                            <i class="bi bi-person"></i>
+                                                                        {% elif 'documento' in field.name %}
+                                                                            <i class="bi bi-card-text"></i>
+                                                                        {% elif 'telefono' in field.name %}
+                                                                            <i class="bi bi-telephone"></i>
+                                                                        {% elif 'nacionalidad' in field.name %}
+                                                                            <i class="bi bi-globe"></i>
+                                                                        {% elif 'email_personal' in field.name %}
+                                                                            <i class="bi bi-envelope"></i>
+                                                                        {% else %}
+                                                                            <i class="bi bi-pencil"></i>
+                                                                        {% endif %}
+                                                                    </span>
+                                                                    {{ field }}
+                                                                </div>
+                                                            {% endif %}
+
+                                                            {% if field.help_text and field.name != 'email' %}
+                                                                <div class="form-text small opacity-75">{{ field.help_text }}</div>
+                                                            {% endif %}
+
+
+
+                                                            {% if field.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {% for error in field.errors %}
+                                                                        <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SECCIÓN 2: Identidad Percibida (Opcional) -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light-subtle" type="button" data-bs-toggle="collapse" data-bs-target="#identidadPercibida">
+                                            <i class="bi bi-person-hearts me-2 text-info fs-5"></i>
+                                            <strong>Identidad Percibida</strong>
+                                            <span class="badge bg-secondary ms-2">Opcional</span>
+                                        </button>
+                                    </h2>
+                                    <div id="identidadPercibida" class="accordion-collapse collapse" data-bs-parent="#profileAccordion">
+                                        <div class="accordion-body p-5">
+                                            <div class="alert alert-info border-0 shadow-sm mb-4">
+                                                <i class="bi bi-info-circle-fill me-2"></i>
+                                                <strong>Información importante:</strong> Si tu identidad de género no coincide con tu nombre legal, puedes registrar tu nombre percibido aquí. Esta información será tratada con absoluta confidencialidad y respeto.
+                                            </div>
+
+                                            <div class="row">
+                                                {% for field in form_identidad %}
+                                                    <div class="col-md-12 mb-4">
+                                                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">
+                                                            {{ field.label }}
+                                                        </label>
+
+                                                        {% if field.name == 'nombre_percibido' %}
+                                                            <div class="input-group">
+                                                                <span class="input-group-text bg-white border-end-0">
+                                                                    <i class="bi bi-person-badge"></i>
+                                                                </span>
+                                                                {{ field }}
+                                                            </div>
+                                                        {% else %}
+                                                            {{ field }}
+                                                        {% endif %}
+
+                                                        {% if field.help_text %}
+                                                            <div class="form-text small">{{ field.help_text }}</div>
+                                                        {% endif %}
+
+                                                        {% if field.errors %}
+                                                            <div class="text-danger small mt-1">
+                                                                {% for error in field.errors %}
+                                                                    <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SECCIÓN 3: Información Específica del Rol -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light-subtle" type="button" data-bs-toggle="collapse" data-bs-target="#infoRol">
+                                            {% if rol == 'ingresante' %}
+                                                <i class="bi bi-arrow-up-right-square me-2 text-primary fs-5"></i>
+                                                <strong>Información de Ingreso</strong>
+                                            {% elif rol == 'estudiante' %}
+                                                <i class="bi bi-mortarboard me-2 text-primary fs-5"></i>
+                                                <strong>Información Académica</strong>
+                                            {% elif rol == 'egresado' %}
+                                                <i class="bi bi-patch-check me-2 text-success fs-5"></i>
+                                                <strong>Información de Egreso</strong>
+                                            {% elif rol == 'docente' %}
+                                                <i class="bi bi-book me-2 text-success fs-5"></i>
+                                                <strong>Información Docente</strong>
+                                            {% elif rol == 'no_docente' %}
+                                                <i class="bi bi-briefcase me-2 text-info fs-5"></i>
+                                                <strong>Información Laboral</strong>
+                                            {% endif %}
+                                            <span class="badge bg-danger ms-2">Requerido</span>
+                                        </button>
+                                    </h2>
+                                    <div id="infoRol" class="accordion-collapse collapse" data-bs-parent="#profileAccordion">
+                                        <div class="accordion-body p-5">
+                                            <div class="row">
+                                                {% if rol == 'ingresante' or rol == 'egresado' %}
+                                                    {% for field in form_especifico %}
+                                                        <div class="col-md-6 mb-4">
+                                                            <label for="{{ field.id_for_label }}" class="form-label small text-uppercase fw-bold text-secondary" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                                                {{ field.label }}
+                                                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                                            </label>
+                                                            {{ field }}
+                                                            {% if field.help_text %}
+                                                                <div class="form-text small opacity-75">{{ field.help_text }}</div>
+                                                            {% endif %}
+                                                            {% if field.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {% for error in field.errors %}
+                                                                        <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endfor %}
+
+                                                {% else %}
+                                                    {% for field in form_especifico %}
+                                                        {% if 'certificado' not in field.name and 'carta' not in field.name and 'fecha_vencimiento' not in field.name and 'ddjj_celiaco' not in field.name %}
+                                                        <div class="col-md-6 mb-4">
+                                                            <label for="{{ field.id_for_label }}" class="form-label small text-uppercase fw-bold text-secondary" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                                                {{ field.label }}
+                                                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                                            </label>
+
+                                                            {% if 'fecha' in field.name or field.name in 'dependencia,carrera,estado_academico,preferencia_menu,categoria_docente,tipo_contrato,area_principal' %}
+                                                                {{ field }}
+                                                            {% else %}
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text bg-white border-end-0 text-muted">
+                                                                        {% if 'legajo' in field.name %}
+                                                                            <i class="bi bi-123"></i>
+                                                                        {% elif 'anio' in field.name %}
+                                                                            <i class="bi bi-calendar-event"></i>
+                                                                        {% elif 'cargo' in field.name %}
+                                                                            <i class="bi bi-person-workspace"></i>
+                                                                        {% else %}
+                                                                            <i class="bi bi-pencil"></i>
+                                                                        {% endif %}
+                                                                    </span>
+                                                                    {{ field }}
+                                                                </div>
+                                                            {% endif %}
+
+                                                            {% if field.help_text %}
+                                                                <div class="form-text small opacity-75">{{ field.help_text }}</div>
+                                                            {% endif %}
+
+                                                            {% if field.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {% for error in field.errors %}
+                                                                        <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+
+                                                <!-- Campo DDJJ Celíaco (solo para estudiantes) -->
+                                                {% if rol == 'estudiante' %}
+                                                    {% for field in form_especifico %}
+                                                        {% if field.name == 'ddjj_celiaco' %}
+                                                            <div class="col-md-12 mb-4" id="ddjj_celiaco_container" style="display: none;">
+                                                                <div class="alert alert-warning border-0 shadow-sm mb-3">
+                                                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                                                    <strong>Atención:</strong> Has seleccionado un menú celíaco. Es obligatorio adjuntar la declaración jurada.
+                                                                </div>
+                                                                <label for="{{ field.id_for_label }}" class="form-label fw-bold text-danger">
+                                                                    {{ field.label }}
+                                                                    <span class="text-danger">*</span>
+                                                                </label>
+                                                                {{ field }}
+                                                                {% if field.help_text %}
+                                                                    <div class="form-text small">{{ field.help_text }}</div>
+                                                                {% endif %}
+                                                                {% if field.errors %}
+                                                                    <div class="text-danger small mt-1">
+                                                                        {% for error in field.errors %}
+                                                                            <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if rol != 'ingresante' and rol != 'egresado' %}
+                                <!-- SECCIÓN 4: Documentación (Certificados, Cartas, etc.) -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-light-subtle" type="button" data-bs-toggle="collapse" data-bs-target="#documentacion">
+                                            <i class="bi bi-file-earmark-text me-2 text-warning fs-5"></i>
+                                            <strong>Documentación</strong>
+                                            <span class="badge bg-secondary ms-2">Opcional</span>
+                                        </button>
+                                    </h2>
+                                    <div id="documentacion" class="accordion-collapse collapse" data-bs-parent="#profileAccordion">
+                                        <div class="accordion-body p-5">
+                                            {% if rol == 'estudiante' %}
+                                                <div class="alert alert-info border-0 shadow-sm mb-4">
+                                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                                    Puedes cargar estos documentos ahora o más adelante. Son necesarios para acceder a ciertos beneficios.
+                                                </div>
+                                            {% elif rol == 'no_docente' or rol == 'docente' %}
+                                                <div class="alert alert-info border-0 shadow-sm mb-4">
+                                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                                    La documentación probatoria puede cargarse ahora o posteriormente.
+                                                </div>
+                                            {% endif %}
+
+                                            <div class="row">
+                                                {% for field in form_especifico %}
+                                                    {% if 'certificado' in field.name or 'carta' in field.name or 'probatoria' in field.name or 'fecha_vencimiento' in field.name %}
+                                                        <div class="col-md-6 mb-4">
+                                                            <label for="{{ field.id_for_label }}" class="form-label fw-bold">
+                                                                {{ field.label }}
+                                                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                                            </label>
+                                                            {{ field }}
+
+                                                            {% if field.help_text %}
+                                                                <div class="form-text small">{{ field.help_text }}</div>
+                                                            {% endif %}
+
+                                                            {% if field.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {% for error in field.errors %}
+                                                                        <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                            </div>
+
+                            <!-- Footer con botones -->
+                            <div class="bg-light-subtle border-top p-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'accounts:seleccionar_rol' %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left me-2"></i>Cambiar Rol
+                                    </a>
+                                    <button type="submit" class="btn btn-primary-custom px-5 py-3 fw-bold shadow-sm">
+                                        Guardar y Finalizar <i class="bi bi-check-lg ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-custom: var(--primary-color, #2C7D4B);
+        --primary-dark: #1e5c35;
+    }
+
+    .profile-page-wrapper {
+        min-height: 90vh;
+        background-color: #f8f9fa;
+        background-image: radial-gradient(#e9ecef 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    /* Accordion Custom Styles */
+    .accordion-button {
+        font-size: 1rem;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(44, 125, 75, 0.1);
+        color: var(--primary-custom);
+        box-shadow: none;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(44, 125, 75, 0.25);
+    }
+
+    /* Inputs Styling */
+    .form-control, .form-select, .input-group-text {
+        border-color: #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .input-group:focus-within .form-control,
+    .input-group:focus-within .input-group-text,
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary-custom);
+        background-color: #fff;
+        box-shadow: 0 0 0 0.2rem rgba(44, 125, 75, 0.1);
+    }
+
+    .input-group:focus-within .input-group-text i {
+        color: var(--primary-custom);
+    }
+
+    /* Badge */
+    .bg-primary-custom {
+        background-color: var(--primary-custom) !important;
+    }
+
+    /* Primary Button */
+    .btn-primary-custom {
+        background-color: var(--primary-custom);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(44, 125, 75, 0.3) !important;
+        color: white;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom);
+    }
+</style>
+
+<script>
+    // Bootstrap validation script
+    (function () {
+      'use strict'
+      var forms = document.querySelectorAll('.needs-validation')
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
+
+    // Mostrar/ocultar campo DDJJ Celíaco según preferencia de menú
+    {% if rol == 'estudiante' %}
+    function toggleDdjjCeliaco() {
+        const preferenciaMenu = document.getElementById('id_preferencia_menu');
+        const ddjjContainer = document.getElementById('ddjj_celiaco_container');
+        const ddjjInput = document.getElementById('id_ddjj_celiaco');
+
+        if (preferenciaMenu && ddjjContainer) {
+            const selectedValue = preferenciaMenu.value.toLowerCase();
+
+            if (selectedValue.includes('celiaco')) {
+                ddjjContainer.style.display = 'block';
+                if (ddjjInput) {
+                    ddjjInput.setAttribute('required', 'required');
+                }
+            } else {
+                ddjjContainer.style.display = 'none';
+                if (ddjjInput) {
+                    ddjjInput.removeAttribute('required');
+                }
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const preferenciaMenu = document.getElementById('id_preferencia_menu');
+
+        if (preferenciaMenu) {
+            // Ejecutar al cargar la página
+            toggleDdjjCeliaco();
+
+            // Ejecutar cuando cambie el select
+            preferenciaMenu.addEventListener('change', toggleDdjjCeliaco);
+        }
+
+        // Filtrado dinámico de carreras según dependencia
+        const dependenciaSelect = document.querySelector('select[name="dependencia"]');
+        const carreraSelect = document.querySelector('select[name="carrera"]');
+
+        if (dependenciaSelect && carreraSelect) {
+            dependenciaSelect.addEventListener('change', function() {
+                const dependenciaId = this.value;
+
+                if (dependenciaId) {
+                    carreraSelect.disabled = false;
+                } else {
+                    carreraSelect.disabled = true;
+                }
+            });
+        }
+    });
+    {% endif %}
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock content %}

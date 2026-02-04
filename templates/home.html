@@ -1,0 +1,173 @@
+{% extends "bienestar_layout/base_bienestar.html" %}
+{% load static %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="home-page-wrapper">
+    <div class="container">
+
+        <!-- Sección de Bienvenida -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h1 class="fw-bold text-dark mb-2">Portal de Servicios</h1>
+                <p class="text-muted fs-5">Bienvenido, {{ user.persona.nombre|default:user.username }}. ¿Qué deseas gestionar hoy?</p>
+            </div>
+        </div>
+
+        <!-- Grid de Accesos Directos -->
+        <div class="row g-4 justify-content-center">
+
+            <!-- Card: Personas -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-card text-center overflow-hidden position-relative">
+                    <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-circle bg-primary bg-opacity-10 text-primary-custom mb-3">
+                            <i class="bi bi-people-fill fs-2"></i>
+                        </div>
+                        <h4 class="card-title fw-bold text-dark mb-1">Personas</h4>
+                        <p class="text-muted small mb-0">Gestión de usuarios</p>
+                        <!-- Stretched Link para hacer toda la card clickeable -->
+                        <a href="{% url 'panel_persona' %}" class="stretched-link"></a>
+                    </div>
+                    <div class="hover-overlay"></div>
+                </div>
+            </div>
+
+            <!-- Card: Actividades -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-card text-center overflow-hidden position-relative">
+                    <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-circle bg-warning bg-opacity-10 text-warning mb-3">
+                            <i class="bi bi-calendar-event-fill fs-2"></i>
+                        </div>
+                        <h4 class="card-title fw-bold text-dark mb-1">Actividades</h4>
+                        <p class="text-muted small mb-0">Eventos y auditoría</p>
+                        <a href="{% url 'actividades_auditor' %}" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Comedor -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-card text-center overflow-hidden position-relative">
+                    <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-circle bg-success bg-opacity-10 text-success mb-3">
+                            <i class="bi bi-egg-fried fs-2"></i>
+                        </div>
+                        <h4 class="card-title fw-bold text-dark mb-1">Comedor</h4>
+                        <p class="text-muted small mb-0">Tickets y menús</p>
+                        <a href="{% url 'panel_comedor' %}" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Salud -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-card text-center overflow-hidden position-relative">
+                    <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-circle bg-danger bg-opacity-10 text-danger mb-3">
+                            <i class="bi bi-heart-pulse-fill fs-2"></i>
+                        </div>
+                        <h4 class="card-title fw-bold text-dark mb-1">Salud</h4>
+                        <p class="text-muted small mb-0">Cobertura, turnos y planes</p>
+
+                        <!-- Toda la card clickeable -->
+                        <a href="{% url 'salud:home' %}" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Card: Panel Admin -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-card text-center overflow-hidden position-relative">
+                    <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-circle bg-secondary bg-opacity-10 text-secondary mb-3">
+                            <i class="bi bi-shield-lock-fill fs-2"></i>
+                        </div>
+                        <h4 class="card-title fw-bold text-dark mb-1">Becas</h4>
+                        <p class="text-muted small mb-0">Configuración del sistema</p>
+                        <a href="{% url 'panel_admin' %}" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placholder para futuras secciones (Enoturismo/Esquí) -->
+            <!--
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-card text-center opacity-50">
+                    <div class="card-body p-4">
+                        <div class="icon-circle bg-light text-muted mb-3">
+                            <i class="bi bi-snow2 fs-2"></i>
+                        </div>
+                        <h4 class="card-title fw-bold text-muted mb-1">Esquí</h4>
+                        <p class="small mb-0">Próximamente</p>
+                    </div>
+                </div>
+            </div>
+            -->
+
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .home-page-wrapper {
+        min-height: 85vh;
+        background-color: #f8f9fa;
+        background-image:
+            radial-gradient(at 0% 0%, rgba(44, 125, 75, 0.03) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(249, 168, 38, 0.03) 0px, transparent 50%),
+            radial-gradient(#e9ecef 1px, transparent 1px);
+        background-size: 100% 100%, 100% 100%, 20px 20px;
+    }
+
+    /* Estilos de las Tarjetas */
+    .hover-card {
+        /* Aumentado a 0.6s para un movimiento más lento y suave */
+        transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        cursor: pointer;
+        background: white;
+        /* SOLUCIÓN: Agregamos un borde transparente inicial para que ocupe espacio y no salte */
+        border-bottom: 4px solid transparent !important;
+    }
+
+    .hover-card:hover {
+        /* El movimiento hacia arriba se mantiene */
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+        /* Solo cambiamos el color, no el grosor, evitando el salto */
+        border-bottom-color: var(--primary-custom) !important;
+    }
+
+    /* Círculos de Iconos */
+    .icon-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.6s ease; /* También suavizamos la rotación del icono */
+    }
+
+    .hover-card:hover .icon-circle {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    /* Títulos */
+    .card-title {
+        font-size: 1.25rem;
+    }
+
+    /* Utilidades de color custom */
+    .text-primary-custom { color: var(--primary-custom) !important; }
+    .bg-primary-custom { background-color: var(--primary-custom) !important; }
+</style>
+{% endblock %}

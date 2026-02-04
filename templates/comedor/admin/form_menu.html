@@ -1,0 +1,242 @@
+<!-- templates/comedor/admin/form_menu.html -->
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="card shadow border-0 rounded-4 mb-4 overflow-hidden">
+    <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-25">
+            <i class="bi bi-fork-knife display-1"></i>
+        </div>
+        <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                 <h2 class="fw-bold mb-1">{{ titulo }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-card">
+    <form method="post" id="menuForm">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Tipo de Menú -->
+                <div class="mb-4">
+                    <label for="{{ form.tipo.id_for_label }}" class="form-label fw-bold">
+                        <i class="bi bi-tag me-2"></i>
+                        {{ form.tipo.label }} *
+                    </label>
+                    {{ form.tipo }}
+                    {% if form.tipo.errors %}
+                    <div class="text-danger mt-1">{{ form.tipo.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">{{ form.tipo.help_text }}</small>
+                </div>
+
+                <!-- Nombre del Menú -->
+                <div class="mb-4">
+                    <label for="{{ form.nombre.id_for_label }}" class="form-label fw-bold">
+                        <i class="bi bi-card-heading me-2"></i>
+                        {{ form.nombre.label }} *
+                    </label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}
+                    <div class="text-danger mt-1">{{ form.nombre.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">Nombre descriptivo del menú</small>
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-4">
+                    <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-bold">
+                        <i class="bi bi-text-paragraph me-2"></i>
+                        {{ form.descripcion.label }}
+                    </label>
+                    {{ form.descripcion }}
+                    {% if form.descripcion.errors %}
+                    <div class="text-danger mt-1">{{ form.descripcion.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">Detalla qué incluye el menú (entrada, plato principal, postre,
+                        bebida, etc.)</small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Precio -->
+                <div class="mb-4">
+                    <label for="{{ form.precio.id_for_label }}" class="form-label fw-bold">
+                        <i class="bi bi-currency-dollar me-2"></i>
+                        {{ form.precio.label }} *
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        {{ form.precio }}
+                    </div>
+                    {% if form.precio.errors %}
+                    <div class="text-danger mt-1">{{ form.precio.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">{{ form.precio.help_text }}</small>
+                </div>
+
+                <!-- Estado Activo -->
+                <div class="mb-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="form-check form-switch">
+                                {{ form.activo }}
+                                <label class="form-check-label fw-bold" for="{{ form.activo.id_for_label }}">
+                                    <i class="bi bi-eye me-2"></i>
+                                    {{ form.activo.label }}
+                                </label>
+                            </div>
+                            {% if form.activo.errors %}
+                            <div class="text-danger mt-2">{{ form.activo.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted d-block mt-2">
+                                {{ form.activo.help_text }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Importante:</strong>
+                    <ul class="mb-0 mt-2 small">
+                        <li>Los campos con * son obligatorios</li>
+                        <li>El precio debe ser mayor a 0</li>
+                        <li>Solo puede existir un menú por tipo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'listar_menus' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle me-2"></i>
+                {{ boton }}
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Preview del menú -->
+{% if menu %}
+<div class="content-card mt-4">
+    <h5 class="mb-3">
+        <i class="bi bi-eye me-2"></i>
+        Vista Previa del Menú
+    </h5>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="badge badge-tipo badge-{{ menu.tipo }} mb-2">
+                        {{ menu.get_tipo_display }}
+                    </span>
+                    <h5 class="card-title">{{ menu.nombre }}</h5>
+                    <p class="card-text text-muted">{{ menu.descripcion }}</p>
+                </div>
+                <div class="text-end">
+                    <div class="precio-grande">
+                        ${{ menu.precio }}
+                    </div>
+                    {% if menu.activo %}
+                    <span class="badge bg-success mt-2">Disponible</span>
+                    {% else %}
+                    <span class="badge bg-secondary mt-2">No disponible</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    /* Definimos las variables de color aquí para que el gradiente funcione */
+    :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+
+    .badge-tipo {
+        font-size: 0.85em;
+        padding: 6px 12px;
+        font-weight: 500;
+    }
+
+    .badge-comun {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .badge-vegetariano {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .badge-celiaco {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: white;
+    }
+
+    .precio-grande {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .form-label {
+        color: #2c3e50;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+</style>
+{% endblock %}

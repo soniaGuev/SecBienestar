@@ -1,0 +1,95 @@
+{% extends 'comedor/admin/base_admin.html' %}
+{% load static %}
+
+{% block admin_content %}
+<div class="content-card">
+    <div class="text-center mb-4">
+        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+        <h3 class="mt-3">Confirmar Eliminación</h3>
+    </div>
+
+    {% if asignaciones > 0 %}
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>No se puede eliminar esta beca</strong>
+            <p class="mb-0 mt-2">
+                La beca <strong>"{{ beca.get_tipo_display }}"</strong> tiene
+                <strong>{{ asignaciones }}</strong> asignación{% if asignaciones > 1 %}es{% endif %} activa{% if asignaciones > 1 %}s{% endif %} a estudiantes.
+            </p>
+            <p class="mb-0 mt-2">
+                Debes eliminar o reasignar todas las becas de los estudiantes antes de eliminar este tipo de beca del catálogo.
+            </p>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'listar_becas' %}" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Volver al Catálogo
+            </a>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            <p class="mb-0">
+                ¿Estás seguro de que deseas eliminar la beca
+                <strong>"{{ beca.get_tipo_display }}"</strong>?
+            </p>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Detalles de la Beca</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Tipo:</dt>
+                    <dd class="col-sm-8">{{ beca.get_tipo_display }}</dd>
+
+                    <dt class="col-sm-4">Estado:</dt>
+                    <dd class="col-sm-8">
+                        {% if beca.activa %}
+                            <span class="badge badge-custom-active">Activa</span>
+                        {% else %}
+                            <span class="badge badge-custom-inactive">Inactiva</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Otorga Monto:</dt>
+                    <dd class="col-sm-8">
+                        {% if beca.tiene_monto %}
+                            Sí - ${{ beca.monto_sugerido }}
+                        {% else %}
+                            No
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Permite Comedor:</dt>
+                    <dd class="col-sm-8">
+                        {% if beca.permite_comedor %}
+                            Sí
+                        {% else %}
+                            No
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Esta acción no se puede deshacer.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'listar_becas' %}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash me-2"></i>
+                    Sí, Eliminar Beca
+                </button>
+            </div>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

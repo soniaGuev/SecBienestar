@@ -1,0 +1,286 @@
+{% extends 'bienestar_layout/base_bienestar.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Comprar Tickets{% endblock %}
+
+{% block content %}
+<div class="buy-ticket-wrapper py-5">
+    <div class="container">
+
+        <!-- Botón Volver -->
+        <div class="mb-4">
+            <a href="{% url 'mis_tickets' %}" class="btn btn-link text-decoration-none text-muted p-0 fw-semibold">
+                <i class="bi bi-arrow-left me-2"></i>Volver a mis tickets
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-9 col-lg-11">
+
+                <!-- Tarjeta Principal -->
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+                    <!-- Encabezado Visual -->
+                    <div class="header-gradient p-5 text-center text-white position-relative overflow-hidden">
+                        <div class="position-relative z-2">
+                            <div class="icon-box bg-white text-success rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center"
+                                 style="width: 80px; height: 80px; font-size: 2.5rem;">
+                                <i class="bi bi-cart-check-fill"></i>
+                            </div>
+                            <h2 class="fw-bold mb-2">Comprar Tickets</h2>
+                            <p class="opacity-90 fs-5 mb-0">Reserva tu lugar en el comedor</p>
+                        </div>
+
+                        <!-- Decoración de fondo -->
+                        <div class="decoration-circle circle-1"></div>
+                        <div class="decoration-circle circle-2"></div>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <!-- SECCIÓN 1: Alerta de Beneficio (Solo si existe) -->
+                        {% if beneficio_disponible and beca_activa %}
+                        <div class="bg-success bg-opacity-10 rounded-3 p-4 mb-5 border border-success border-opacity-25 position-relative overflow-hidden">
+                            <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                                <i class="bi bi-gift-fill display-1 text-success"></i>
+                            </div>
+                            <div class="d-flex align-items-start position-relative z-1">
+                                <i class="bi bi-percent text-success fs-3 me-3 mt-1"></i>
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-1">¡Beneficio Activo Detectado!</h5>
+                                    <p class="text-muted mb-2 small">
+                                        Se aplicará un descuento especial a tu compra por tu beca <strong>{{ beca_activa.beca.tipo }}</strong>.
+                                    </p>
+
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        {% if beneficio_disponible.tipo_beneficio == 'gratuito' or beneficio_disponible.porcentaje_descuento == 100 %}
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">
+                                            <i class="bi bi-stars me-1"></i> 100% Bonificado
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-primary-custom text-black-50 px-3 py-2 rounded-pill">
+                                            <i class="bi bi-arrow-down-circle-fill me-1"></i> {{ beneficio_disponible.porcentaje_descuento }}% OFF
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- SECCIÓN 2: Menús Disponibles -->
+                        <h6 class="text-uppercase text-muted fw-bold small mb-4 ls-1 border-bottom pb-2">
+                            Menús Disponibles para Hoy
+                        </h6>
+
+                        <div class="row g-4 mb-5">
+                            {% if preferencia_usuario and menu_a_mostrar %}
+                                <!-- MOSTRAR EL MENÚ SEGÚN PREFERENCIA DEL USUARIO -->
+                                {% if menu_a_mostrar.activo %}
+                                <div class="col-12">
+                                    <div class="card h-100 border rounded-4 menu-card-item overflow-hidden shadow-sm hover-effect">
+                                        <div class="card-body p-4 d-flex flex-column">
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <span class="badge {% if preferencia_usuario == 'vegetariano' or preferencia_usuario == 'celiaco vegetariano' %}bg-success{% else %}bg-primary-custom{% endif %} bg-opacity-10 text-dark border border-opacity-25">
+                                                    {% if preferencia_usuario == 'comun' %}
+                                                        <i class="bi bi-egg-fried me-1"></i> Clásico
+                                                    {% elif preferencia_usuario == 'vegetariano' %}
+                                                        <i class="bi bi-flower1 me-1"></i> Vegetariano
+                                                    {% elif preferencia_usuario == 'celiaco_comun' %}
+                                                        <i class="bi bi-egg-fried me-1"></i> Celíaco Común
+                                                    {% elif preferencia_usuario == 'celiaco_vegetariano' %}
+                                                        <i class="bi bi-flower1 me-1"></i> Celíaco Vegetariano
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <h4 class="fw-bold mb-2 text-dark">{{ menu_a_mostrar.nombre }}</h4>
+                                            <p class="text-muted mb-4 small flex-grow-1">{{ menu_a_mostrar.descripcion }}</p>
+                                            <div class="d-flex align-items-end justify-content-between mt-auto pt-3 border-top">
+                                                <div>
+                                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Precio Unitario</small>
+                                                    {% if beneficio_disponible and precio_final_menu is not None %}
+                                                        <span class="text-decoration-line-through text-muted small me-1">$${{ menu_a_mostrar.precio|floatformat:2|intcomma }}</span>
+                                                        <span class="fw-bold fs-4 text-dark">${{ precio_final_menu|floatformat:2|intcomma }}</span>
+                                                    {% else %}
+                                                        <span class="fw-bold fs-4 text-dark">${{ menu_a_mostrar.precio }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                <i class="bi {% if preferencia_usuario == 'vegetariano' or preferencia_usuario == 'celiaco vegetariano' %}bi-flower1 text-success{% else %}bi-fork-knife text-primary-custom{% endif %} opacity-25" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="col-12">
+                                    <div class="alert alert-warning d-flex align-items-center shadow-sm rounded-3">
+                                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                                        <div><strong>El menú según tu preferencia no está disponible en este momento.</strong></div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <!-- SIN PREFERENCIA: Mostrar mensaje para configurar -->
+                                <div class="col-12">
+                                    <div class="alert alert-info d-flex align-items-center shadow-sm rounded-3">
+                                        <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                                        <div>
+                                            <strong>No tienes una preferencia de menú configurada.</strong>
+                                            <p class="mb-0 small">Por favor, configura tu preferencia de menú en tu perfil.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- SECCIÓN 3: Formulario de Confirmación -->
+                        <div class="bg-light rounded-4 p-4 p-md-5 border">
+                            <h4 class="fw-bold mb-4 text-dark">
+                                <i class="bi bi-wallet2 me-2 text-primary-custom"></i>Confirmar Compra
+                            </h4>
+
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="row align-items-center g-4">
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-muted small text-uppercase fw-bold me-2">Tu pedido:</span>
+                                            <span class="badge bg-dark">1 Ticket</span>
+                                        </div>
+
+                                        <div class="fs-5">
+                                            {% if menu_a_mostrar %}
+                                                {{ menu_a_mostrar.nombre }}
+                                            {% else %}
+                                                Ticket de Comedor
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- PRECIO FINAL -->
+                                        <div class="mt-2">
+                                            {% if beneficio_disponible and precio_final_menu is not None %}
+                                                <span class="text-decoration-line-through text-muted small me-2">
+                                                    ${{ menu_a_mostrar.precio|floatformat:2|intcomma }}
+                                                </span>
+                                                <span class="fw-bold text-success fs-3">
+                                                    {% if precio_final_menu == 0 %}
+                                                        ¡GRATIS!
+                                                    {% else %}
+                                                        ${{ precio_final_menu|floatformat:2|intcomma }}
+                                                    {% endif %}
+                                                </span>
+                                            {% elif menu_a_mostrar %}
+                                                <span class="fw-bold text-dark fs-3">
+                                                    ${{ menu_a_mostrar.precio }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 text-md-end">
+                                        <!-- ERRORES DE FORMULARIO -->
+                                        {% if form.non_field_errors %}
+                                        <div class="alert alert-danger mb-3 small py-2">
+                                            {{ form.non_field_errors }}
+                                        </div>
+                                        {% endif %}
+
+                                        {% if menu_a_mostrar and menu_a_mostrar.activo %}
+                                            <button type="submit" class="btn btn-primary-custom btn-lg rounded-pill shadow-sm fw-bold px-4 w-100">
+                                                {% if beneficio_disponible and precio_final_menu == 0 %}
+                                                    <i class="bi bi-qr-code me-2"></i>Generar Gratis
+                                                {% else %}
+                                                    <i class="bi bi-credit-card me-2"></i>Pagar Ahora
+                                                {% endif %}
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary btn-lg rounded-pill shadow-sm fw-bold px-4 w-100" disabled>
+                                                <i class="bi bi-x-circle me-2"></i>No Disponible
+                                            </button>
+                                        {% endif %}
+
+                                        <a href="{% url 'mis_tickets' %}" class="btn btn-link text-muted text-decoration-none mt-2 d-inline-block small">
+                                            Cancelar
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+        --accent-custom: #f9a826;
+    }
+
+    .buy-ticket-wrapper {
+        min-height: 90vh;
+        background-color: #f4f7f6;
+        background-image: radial-gradient(#e9ecef 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .header-gradient {
+        background: linear-gradient(135deg, #28a745 0%, var(--primary-custom) 100%);
+    }
+
+    .decoration-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 1;
+    }
+
+    .circle-1 {
+        width: 300px;
+        height: 300px;
+        top: -100px;
+        right: -50px;
+    }
+
+    .circle-2 {
+        width: 150px;
+        height: 150px;
+        bottom: -20px;
+        left: -20px;
+    }
+
+    .z-1 { z-index: 1; }
+    .z-2 { z-index: 2; }
+    .ls-1 { letter-spacing: 1px; }
+
+    .hover-effect {
+        transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .hover-effect:hover {
+        transform: translateY(-3px);
+        border-color: var(--primary-custom) !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .btn-primary-custom {
+        background-color: var(--primary-custom);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(44, 125, 75, 0.3) !important;
+        color: white;
+    }
+</style>
+{% endblock %}

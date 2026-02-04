@@ -1,0 +1,302 @@
+{% load static %}
+{% load materializecss %}
+{% load humanize %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!--Import materialize.css-->
+    <link rel="stylesheet" href="{% static 'css/materialize.min.css' %}">
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+
+    <!-- Font Awesome-->
+    <script src="https://kit.fontawesome.com/c2dba015b9.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- htmx CDN -->
+    <script src="https://unpkg.com/htmx.org@1.8.0"
+            integrity="sha384-cZuAZ+ZbwkNRnrKi05G/fjBX+azI9DNOkNYysZ0I/X5ZFgsmMiBXgDZof30F5ofc"
+            crossorigin="anonymous"></script>
+
+    <!--mobile optimiztion -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}{% endblock title %} {{NOMBRE}} </title>
+</head>
+
+<style>
+
+    a.valign-wrapper {
+  height: 60px; /* o el alto que necesites */
+}
+
+    .page-footer{
+    background-color: {{BARRA}};}
+
+    .footer-copyright{
+    background-color: {{BARRA}};
+    filter: brightness(0.4); /* más oscuro */
+    }
+
+    .barra {
+        background-color: {{BARRA}};
+        height: {{BARRA_ALTO}}px !important;
+    }
+
+    body {
+        /*font-family: 'Montserrat', sans-serif;*/
+    }
+</style>
+
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<div class="navbar-fixed">
+    <nav class="barra">
+        <div class="container">
+            <!-- Nav Dropdown -->
+            <ul id="dropdown1" class="dropdown-content">
+                <li>
+                    <a href="{% url 'accounts:profile' %}">Perfil</a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="{% url 'account_logout' %}">Salir</a>
+                </li>
+            </ul>
+
+
+
+            <!-- end nav dropdown -->
+            <div class="nav-wrapper">
+                <a href="/" class=" flow-text hide-on-small-only left small valign-wrapper"><img width="{{LOGO_ANCHO}}" height="{{LOGO_ALTO}}" src="{% static LOGO %}" class="brand-img" decoding="async"></a>
+                <a href="/" class="brand-logo hide-on-med-and-up valign-wrapper"><img width="{{LOGO_ANCHO}}" height="{{LOGO_ALTO}}" src="{% static LOGO %}" class="brand-img" decoding="async"></a>
+                <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    {% if user.is_authenticated %}
+
+                        <!-- Dropdown Trigger for User Profile -->
+                        <li><a class="dropdown-trigger btn-floating" href="#!" data-target="dropdown1">
+                           <!-- <img src="#" class="avatar responsive-img">-->
+                        </a></li>
+
+                    {% else %}
+                        <li>
+                            <a href="{% url 'account_login' %}">Ingresar</a>
+                        </li>
+                       {% if REGISTRO %}
+			<li>
+			    <a class="waves-effect indigo waves-light btn" href="{% url 'account_signup' %}">Registro</a>
+			</li>
+		    {% endif %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+<!-- Nav search bar
+<nav class="deep-green lighten-4">
+    <div class="nav-wrapper">
+      <form action="/search">
+        <div class="input-field">
+          <input id="search" type="search" name="q" required">
+          <label class="label-icon" for="search"><i class="material-icons deep-green-text">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+      </form>
+    </div>
+</nav>
+-->
+<!-- sidenav slideout -->
+<ul id="slide-out" class="sidenav">
+    {% if user.is_authenticated %}
+        <li>
+            <div class="user-view">
+                <div class="background">
+                    <img src="{% static 'images/office.jpg' %}">
+                </div>
+                <!--<a href="#user"><img class="circle" src="#"></a>-->
+                <a href="#name"><span class="white-text name">{{ user.username }}</span></a>
+                <a href="#email"><span class="white-text email">{{ user.email }}</span></a>
+            </div>
+        </li>
+    {% else %}
+        <li>
+            <div class="user-view">
+                <div class="background">
+                    <img src="{% static 'images/office.jpg' %}">
+                </div>
+                <a href="#user"><img class="circle" src="/media/avatars/user_avatar.png"></a>
+                <a href="#name"><span class="white-text name">Invitado</span></a>
+                <a href="#email"><span class="white-text email"></span></a>
+            </div>
+        </li>
+    {% endif %}
+
+    <li><a class="waves-effect" href="/"><i class="material-icons">home</i>Inicio</a></li>
+    {% if user.is_authenticated %}
+
+
+    {% endif %}
+    <li>
+        <div class="divider"></div>
+    </li>
+    <li><a class="subheader">Cuentas</a></li>
+    {% if user.is_authenticated %}
+        <li><a class="waves-effect" href="{% url 'accounts:profile' %}"><i class="material-icons">account_circle</i>Perfil</a>
+        </li>
+        <li><a class="waves-effect" href="{% url 'account_logout' %}"><i
+                class="material-icons">highlight_off</i>Salir</a>
+        </li>
+    {% else %}
+        <li><a class="waves-effect" href="{% url 'account_login' %}"><i
+                class="material-icons">exit_to_app</i>Ingresar</a></li>
+    {% if REGISTRO %}
+        <li><a class="waves-effect" href="{% url 'account_signup' %}"><i
+                class="material-icons">launch</i>Registrarse</a></li>
+    {% endif %}
+    {% endif %}
+
+</ul>
+
+<div class="container">
+    <!-- Messages list -->
+    {% if messages %}
+        <ul id="messages-queue" class="collection green-text text-darken-4" style="display: none;">
+            {% for message in messages %}
+                <li id="dj-msg" {% if message.tags %} class="{{ message.tags }} collection-item indigo lighten-5"
+                {% endif %}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div class="section">
+    {% block content %}
+
+    {% endblock content %}
+</div>
+</div>
+
+{% block script %}
+
+{% endblock script %}
+
+<script src="{% static 'js/materialize.min.js' %}"></script>
+<footer class="page-footer darken-3">
+    <div class="container">
+        <div class="row">
+            <!-- Sección de información -->
+            <div class="col l6 s12">
+                <h5 class="white-text">{{NOMBRE}}</h5>
+                <p class="grey-text text-lighten-4">
+                    {{DESCRIPCION}}
+                </p>
+            </div>
+
+            <!-- Sección de enlaces
+            <div class="col l4 offset-l2 s12">
+                <h5 class="white-text">Enlaces</h5>
+                <ul>
+                    <li><a class="grey-text text-lighten-3" href="#!">Inicio</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">EMETUR</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Prestadores</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Contacto</a></li>
+                </ul>
+            </div-->
+        </div>
+    </div>
+
+
+    <!-- Sección de Copyright -->
+    <div class="footer-copyright darken-4">
+        <div class="container center-align">
+            © 2025 {{NOMBRE}}
+        </div>
+    </div>
+</footer>
+<script>
+    M.AutoInit();
+
+    // floatin action buttons init
+    document.addEventListener('DOMContentLoaded', function () {
+        var fab = document.querySelectorAll('.fixed-action-btn');
+        var instances = M.FloatingActionButton.init(fab, {});
+    });
+    // end floating action buttons
+
+    // dropdown
+    document.addEventListener('DOMContentLoaded', function () {
+        var drop = document.querySelectorAll('.dropdown-trigger');
+        var instances = M.Dropdown.init(drop, {});
+    });
+
+    // Create Post Modal
+    document.addEventListener('DOMContentLoaded', function () {
+        var pmodal = document.querySelectorAll('.modal');
+        var instances = M.Modal.init(pmodal, {});
+    });
+
+    // Materialize side nav init
+    document.addEventListener('DOMContentLoaded', function () {
+        var snav = document.querySelectorAll('.sidenav');
+        var instances = M.Sidenav.init(snav, {});
+    });
+
+    /* date picker materialized css */
+    document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('.datepicker');
+  var options={
+        autoClose:true,
+format:'dd/mm/yyyy',
+
+      i18n: {
+                months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                monthsShort: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Set", "Oct", "Nov", "Dic"],
+                weekdays: ["Domingo","Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+                weekdaysShort: ["Dom","Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
+                weekdaysAbbrev: ["D","L", "M", "M", "J", "V", "S"],
+                cancel: 'Cancelar',
+                clear: 'Limpiar',
+                done: 'Aceptar'
+            }}
+  M.Datepicker.init(elems, options);
+});
+
+    // Materialized CSS Collapsible init
+    document.addEventListener('DOMContentLoaded', function () {
+        var collaps = document.querySelectorAll('.collapsible');
+        var instances = M.Collapsible.init(collaps, {});
+    });
+
+    // show messages as materialize toast
+    document.addEventListener('DOMContentLoaded', function msgToast() {
+        const msgEl = document.getElementById('dj-msg')
+        if (msgEl != null) {
+            let msg = msgEl.textContent
+            M.toast({html: msg})
+        }
+    })
+    document.addEventListener('DOMContentLoaded', function () {
+        var dropdowns = document.querySelectorAll('.dropdown-trigger');
+        M.Dropdown.init(dropdowns, {});
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+	  var elems = document.querySelectorAll('select[multiple]');
+	  M.FormSelect.init(elems, {
+	    closeOnSelect: false
+	  });
+	});
+
+</script>
+<!-- Botón flotante de volver -->
+<div class="fixed-action-btn left" style="left: 24px; right: auto;">
+  <a class="btn-floating btn-large" style="background-color: {{ BARRA }}" onclick="window.location.href='/'" title="Inicio">
+    <i class="material-icons">home</i>
+  </a>
+</div>
+</body>
+</html>

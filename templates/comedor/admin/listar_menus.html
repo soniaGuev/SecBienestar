@@ -1,0 +1,170 @@
+<!-- templates/comedor/admin/listar_menus.html -->
+{% extends 'comedor/panel_comedor.html' %}
+
+{% block admin_content %}
+<div class="card shadow border-0 rounded-4 mb-4 overflow-hidden">
+        <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+            <div class="position-absolute top-0 end-0 p-3 opacity-25">
+                <i class="bi bi-fork-knife display-1"></i>
+            </div>
+            <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1">Gestión de Menús</h2>
+                    <p class="mb-0 opacity-90">
+                        Registro completo de todos los Menús para Comedor Universitario
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'crear_menu' %}" class="btn btn-light text-primary-custom fw-bold rounded-pill shadow-sm">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Crear Nuevo Menú
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-custom" role="alert">
+    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="content-card">
+    {% if menus %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Tipo</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for menu in menus %}
+            <tr>
+                <td>
+                                <span class="badge badge-tipo badge-{{ menu.tipo }}">
+                                    {{ menu.get_tipo_display }}
+                                </span>
+                </td>
+                <td>
+                    <strong>{{ menu.nombre }}</strong>
+                </td>
+                <td>
+                                <span class="">
+                                    ${{ menu.precio }}
+                                </span>
+                </td>
+                <td>
+                    {% if menu.activo %}
+                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Activo
+                                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary">
+                                        <i class="bi bi-pause-circle me-1"></i>
+                                        Inactivo
+                                    </span>
+                    {% endif %}
+                </td>
+                <td class="d-flex justify-content-center">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="{% url 'editar_menu' menu.pk %}"
+                           class="btn btn-outline-primary"
+                           title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'toggle_activo_menu' menu.pk %}"
+                           class="btn btn-outline-warning"
+                           title="{% if menu.activo %}Desactivar{% else %}Activar{% endif %}">
+                            <i class="bi bi-{% if menu.activo %}pause{% else %}play{% endif %}-circle"></i>
+                        </a>
+                        <a href="{% url 'eliminar_menu' menu.pk %}"
+                           class="btn btn-outline-danger"
+                           title="Eliminar"
+                           onclick="return confirm('¿Estás seguro de eliminar este menú?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-clipboard-x" style="font-size: 64px; color: #ccc;"></i>
+        <p class="text-muted mt-3">No hay menús creados aún</p>
+        <a href="{% url 'crear_menu' %}" class="btn btn-success mt-2">
+            <i class="bi bi-plus-circle me-2"></i>
+            Crear Primer Menú
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Definimos las variables de color aquí para que el gradiente funcione */
+    :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge-tipo {
+        font-size: 0.85em;
+        padding: 6px 12px;
+        font-weight: 500;
+    }
+
+    .badge-comun {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .badge-vegetariano {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .badge-celiaco_comun, .badge-celiaco_vegetariano {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: white;
+    }
+
+
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .btn-group-sm .btn {
+        padding: 4px 8px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load materializecss %}
+{% load static %}
+
+{% block title %}Mi Perfil{% endblock title %}
+
+{% block content %}
+<div class="row">
+<!-- profile chip -->
+<div class="col s12 m8 offset-m2">
+  <h4 class="center text-darken-3">Mi Perfil</h4>
+
+  <div class="card-panel grey lighten-5 z-depth-1">
+    <div class="row valign-wrapper">
+      <div class="col s2">
+       <!-- <img src="{{ user.userprofile.avatar_thumbnail.url }}" alt="{{user.userprofile.name}} avatar" class="circle responsive-img">  -->
+      </div>
+      <div class="black-text col s10">
+        <!--p>Nombres: {{ user.userprofile.name }}</p-->
+        <p>Correo: {{ user.email }}</p>
+        <!--p>Bio: {{ user.userprofile.bio }}</p-->
+       {% comment %}<p><a href="{{ user.userprofile.get_public_profile_url }}" class="btn btn-small wave-effects">Mi perfil público</a></p>{% endcomment %}
+        <a href="#profile-form" onClick="showUpdateForm()" class="btn-floating waves-effect waves-light right red">
+          <i class="material-icons">edit</i>
+          </a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="row">
+    <div id="profile-update" class="col s12 m8 offset-m2" style="display: none;">
+        <h4 class="center text-darken-3">Actualizar tu perfil.</h4>
+        <form id="profile-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Guardar</button>
+        </form>      
+    </div>
+</div>
+  <section>
+    <div class="row">
+      <div class="col s12 m8 offset-m2">
+        <ul class="collection with-header">
+          <li class="collection-header"><h5 class="center text-darken-3">Acciones:</h5></li>
+          <li class="collection-item"><a href="{% url 'account_email' %}">Cambiar el correo electrónico</a></li>
+          <li class="collection-item"><a href="{% url 'account_change_password' %}">Cambiar contraseña</a></li>
+        </ul>
+      </div>
+    </div>
+    </section>
+
+<div class="row">
+  <div class="col s12 m8 offset-m2">
+    <section>
+      {% if posts %}
+      <h4 class="green-text text-darken-3">My Posts</h4>
+      <div class="collection">
+        {% for post in posts %}
+        <a href="{% url 'posts:detail' post.slug %}" class="collection-item">{{ post.title }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+
+{% endblock content %}
+
+{% block script %}
+<script>
+  // show update profile form
+  updateProfielEl = document.getElementById('profile-update')
+  function showUpdateForm () {
+    updateProfielEl.style.display = "block"
+  }
+</script>
+{% endblock script %}

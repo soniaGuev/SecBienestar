@@ -1,0 +1,55 @@
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="content-card">
+    <h3 class="mb-4 text-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Confirmar Eliminación de Beca
+    </h3>
+
+    <div class="alert alert-danger">
+        <h5 class="alert-heading">¿Estás seguro de eliminar esta beca?</h5>
+        <hr>
+        <p class="mb-0">
+            Se eliminará la beca <strong>{{ persona_beca.beca.tipo }}</strong>
+            del estudiante <strong>{{ persona_beca.persona_estudiante.persona.nombre_completo }}</strong>
+        </p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <strong>Detalles de la Beca</strong>
+        </div>
+        <div class="card-body">
+            <ul class="mb-0">
+                <li><strong>Tipo:</strong> {{ persona_beca.beca.tipo }}</li>
+                <li><strong>Fecha Inicio:</strong> {{ persona_beca.fecha_inicio|date:"d/m/Y" }}</li>
+                <li><strong>Fecha Fin:</strong> {{ persona_beca.fecha_fin|date:"d/m/Y" }}</li>
+                <li><strong>Estado:</strong> {{ persona_beca.get_estado_beca_display }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <form method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-2"></i>
+            Sí, eliminar beca
+        </button>
+        <a href="{% url 'detalle_beneficiario' persona_beca.persona_estudiante.id %}"
+           class="btn btn-secondary ms-2">
+            <i class="bi bi-x-circle me-2"></i>
+            Cancelar
+        </a>
+    </form>
+</div>
+
+<style>
+.content-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

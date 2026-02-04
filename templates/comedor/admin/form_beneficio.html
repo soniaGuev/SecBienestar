@@ -1,0 +1,196 @@
+<!-- templates/comedor/admin/form_beneficio.html -->
+{% extends 'comedor/admin/base_admin.html' %}
+
+{% block admin_content %}
+
+<div class="card shadow border-0 rounded-4 mb-4 overflow-hidden">
+    <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-25">
+            <i class="bi bi-gift display-1"></i>
+        </div>
+        <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                 <h2 class="fw-bold mb-1">{{ titulo }}</h2>
+            </div>
+            <a href="{% url 'listar_beneficios' %}" class="btn btn-outline-light">
+            <i class="bi bi-arrow-left me-2"></i>
+            Volver
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="content-card">
+    <form method="post" id="beneficioForm">
+        {% csrf_token %}
+
+        <!-- Tipo de Beca - Ancho completo -->
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-4">
+                    <label for="{{ form.tipo_beca.id_for_label }}" class="form-label fw-bold">
+                        <i class="bi bi-award me-2"></i>
+                        Tipo de Beca *
+                    </label>
+                    {{ form.tipo_beca }}
+                    {% if form.tipo_beca.errors %}
+                        <div class="text-danger mt-1">{{ form.tipo_beca.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">{{ form.tipo_beca.help_text }}</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tipo de Beneficio y Porcentaje en la misma fila -->
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Tipo de Beneficio -->
+                <div class="mb-3">
+                    <label for="{{ form.tipo_beneficio.id_for_label }}" class="form-label fw-bold">
+                        <i class="bi bi-gift me-2"></i>
+                        Tipo de Beneficio *
+                    </label>
+                    {{ form.tipo_beneficio }}
+                    {% if form.tipo_beneficio.errors %}
+                        <div class="text-danger mt-1">{{ form.tipo_beneficio.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">{{ form.tipo_beneficio.help_text }}</small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Porcentaje de Descuento -->
+                <div class="mb-3">
+                    <label for="{{ form.porcentaje_descuento.id_for_label }}" class="form-label fw-bold">
+                        <i class="bi bi-percent me-2"></i>
+                        Porcentaje de Descuento (%) *
+                    </label>
+                    <div class="input-group">
+                        {{ form.porcentaje_descuento }}
+                        <span class="input-group-text">%</span>
+                    </div>
+                    {% if form.porcentaje_descuento.errors %}
+                        <div class="text-danger mt-1">{{ form.porcentaje_descuento.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">{{ form.porcentaje_descuento.help_text }}</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activo - Ancho completo -->
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        {{ form.activo }}
+                        <label class="form-check-label fw-bold" for="{{ form.activo.id_for_label }}">
+                            <i class="bi bi-toggle-on me-2"></i>
+                            ¿Beneficio activo?
+                        </label>
+                    </div>
+                    {% if form.activo.errors %}
+                        <div class="text-danger mt-1">{{ form.activo.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">{{ form.activo.help_text }}</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de ayuda -->
+        <div class="alert alert-info mb-3">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Información:</strong>
+            <ul class="mb-0 mt-2">
+                <li><strong>Acceso Gratuito:</strong> Selecciona "Acceso Gratuito (100%)" y el porcentaje debe ser 100%</li>
+                <li><strong>Descuento Porcentual:</strong> Selecciona "Descuento Porcentual" e ingresa el porcentaje (ej: 50 para 50% de descuento)</li>
+                <li><strong>Sin Beneficio:</strong> Selecciona "Sin Beneficio" y el porcentaje será 0%</li>
+            </ul>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'listar_beneficios' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle me-2"></i>
+                {{ boton }}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Script para actualizar automáticamente el porcentaje según el tipo de beneficio
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoBeneficioSelect = document.getElementById('{{ form.tipo_beneficio.id_for_label }}');
+    const porcentajeInput = document.getElementById('{{ form.porcentaje_descuento.id_for_label }}');
+
+    if (tipoBeneficioSelect && porcentajeInput) {
+        tipoBeneficioSelect.addEventListener('change', function() {
+            const tipoSeleccionado = this.value;
+
+            if (tipoSeleccionado === 'gratuito') {
+                porcentajeInput.value = '100.00';
+                porcentajeInput.readOnly = true;
+            } else if (tipoSeleccionado === 'ninguno') {
+                porcentajeInput.value = '0.00';
+                porcentajeInput.readOnly = true;
+            } else {
+                porcentajeInput.readOnly = false;
+                if (porcentajeInput.value === '100.00' || porcentajeInput.value === '0.00') {
+                    porcentajeInput.value = '';
+                }
+            }
+        });
+
+        // Ejecutar al cargar para inicializar correctamente
+        tipoBeneficioSelect.dispatchEvent(new Event('change'));
+    }
+});
+</script>
+
+<style>
+      :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+.content-card {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.form-label {
+    color: #34495e;
+}
+
+.input-group-text {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,357 @@
+{% extends 'persona/panel_persona.html' %}
+{% load static %}
+
+{% block title %}Detalle de {{ persona.nombre_completo }}{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow border-0 rounded-4 mb-2 overflow-hidden">
+    <div class="bg-gradient-custom text-white p-4 position-relative" style="min-height: 120px;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-25">
+            <i class="bi bi-person-badge display-1"></i>
+        </div>
+        <div class="position-relative z-1 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                 <h2 class="fw-bold mb-1">Informacion personal de {{ persona.nombre_completo }}</h2>
+            </div>
+            <a href="{% url 'listar_personas' %}" class="btn btn-outline-light">
+            <i class="bi bi-arrow-left me-2"></i>
+            Volver
+            </a>
+        </div>
+    </div>
+</div>
+<div class="container-fluid py-4">
+
+    <!-- Header simple como en detalle_beneficiario -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+
+            <!-- Botones de acción simples -->
+            <div class="btn-group">
+                <a href="{% url 'editar_persona' persona.id %}" class="btn btn-warning rounded-2 btn-sm m-2 ">
+                    <i class="bi bi-pencil me-1"></i> Editar
+                </a>
+                <a href="{% url 'agregar_observacion' persona.id %}" class="btn btn-info rounded-2 btn-sm text-white m-2">
+                    <i class="bi bi-chat-left-text me-1"></i> Observación
+                </a>
+                <a href="{% url 'eliminar_persona' persona.id %}" class="btn btn-danger rounded-2 btn-sm m-2">
+                    <i class="bi bi-trash me-1"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Tarjeta de Datos Personales -->
+    <div class="content-card mb-4">
+        <h5 class="mb-3">
+            <i class="bi bi-person-lines-fill me-2"></i>
+            Datos Personales
+        </h5>
+
+        <table class="table table-borderless table-sm">
+            <tr>
+                <th width="200">Nombre Legal:</th>
+                <td>{{ persona.nombre }} {{ persona.apellido }}</td>
+            </tr>
+            {% if persona.nombre_percibido %}
+            <tr>
+                <th>Nombre Percibido:</th>
+                <td>
+                    {{ persona.nombre_percibido }}
+                    {% if persona.nombre_percibido_validado %}
+                    <span class="badge bg-success ms-2">Validado</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark ms-2">Pendiente</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            <tr>
+                <th>{{ persona.get_tipo_documento_display }}:</th>
+                <td>{{ persona.documento }}</td>
+            </tr>
+            <tr>
+                <th>Género:</th>
+                <td>{{ persona.get_genero_display }}</td>
+            </tr>
+            <tr>
+                <th>Nacionalidad:</th>
+                <td>{{ persona.nacionalidad }}</td>
+            </tr>
+            <tr>
+                <th>Rol:</th>
+                <td><span class="badge bg-primary">{{ persona.get_rol_display }}</span></td>
+            </tr>
+            <tr>
+                <th>Sede:</th>
+                <td>{{ persona.get_sede_display }}</td>
+            </tr>
+        </table>
+
+        <hr class="my-3">
+
+        <h6 class="fw-bold mb-3"><i class="bi bi-envelope me-2"></i>Datos de Contacto</h6>
+        <table class="table table-borderless table-sm">
+            <tr>
+                <th width="200">Correo Institucional:</th>
+                <td><a href="mailto:{{ persona.correo }}" class="text-decoration-none">{{ persona.correo }}</a></td>
+            </tr>
+            <tr>
+                <th>Correo Personal:</th>
+                <td>{{ persona.correo_personal|default:"No especificado" }}</td>
+            </tr>
+            <tr>
+                <th>Teléfono:</th>
+                <td>{{ persona.telefono|default:"No especificado" }}</td>
+            </tr>
+        </table>
+
+        {% if persona.contacto_emergencia_nombre %}
+        <hr class="my-3">
+        <h6 class="fw-bold mb-3 text-danger"><i class="bi bi-heart-pulse me-2"></i>Contacto de Emergencia</h6>
+        <table class="table table-borderless table-sm">
+            <tr>
+                <th width="200">Nombre:</th>
+                <td>{{ persona.contacto_emergencia_nombre }}</td>
+            </tr>
+            <tr>
+                <th>Teléfono:</th>
+                <td>{{ persona.contacto_emergencia_telefono }}</td>
+            </tr>
+        </table>
+        {% endif %}
+    </div>
+
+    <!-- Información Específica según Rol -->
+    {% if perfil_especifico %}
+    <div class="content-card mb-4">
+        <h5 class="mb-3">
+            <i class="bi bi-briefcase me-2"></i>
+            Información Académica / Laboral
+        </h5>
+
+        <table class="table table-borderless table-sm">
+            {% if persona.rol == 'estudiante' %}
+                <tr>
+                    <th width="200">Número de Legajo:</th>
+                    <td><strong>{{ perfil_especifico.numero_legajo }}</strong></td>
+                </tr>
+                <tr>
+                    <th>Carrera:</th>
+                    <td>{{ perfil_especifico.carrera }}</td>
+                </tr>
+                <tr>
+                    <th>Dependencia:</th>
+                    <td>{{ perfil_especifico.dependencia|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Año de Ingreso:</th>
+                    <td>{{ perfil_especifico.anio_ingreso }}</td>
+                </tr>
+                <tr>
+                    <th>Estado Académico:</th>
+                    <td>
+                        <span class="badge {% if perfil_especifico.estado_academico == 'R' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                            {{ perfil_especifico.get_estado_academico_display }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Regularidad Validada:</th>
+                    <td>
+                        {% if perfil_especifico.validado_como_regular %}
+                            <span class="text-success"><i class="bi bi-check-circle-fill"></i> Sí</span>
+                        {% else %}
+                            <span class="text-danger"><i class="bi bi-x-circle-fill"></i> No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Preferencia de Menú:</th>
+                    <td><span class="badge bg-info">{{ perfil_especifico.get_preferencia_menu_display }}</span></td>
+                </tr>
+
+            {% elif persona.rol == 'docente' %}
+                <tr>
+                    <th width="200">Legajo:</th>
+                    <td><strong>{{ perfil_especifico.numero_legajo }}</strong></td>
+                </tr>
+                <tr>
+                    <th>Categoría:</th>
+                    <td>{{ perfil_especifico.get_categoria_docente_display }}</td>
+                </tr>
+                <tr>
+                    <th>Dependencia:</th>
+                    <td>{{ perfil_especifico.dependencia }}</td>
+                </tr>
+                <tr>
+                    <th>Ingreso Docencia:</th>
+                    <td>{{ perfil_especifico.fecha_ingreso_docencia|date:"d/m/Y" }}</td>
+                </tr>
+
+            {% elif persona.rol == 'no_docente' %}
+                <tr>
+                    <th width="200">Legajo:</th>
+                    <td><strong>{{ perfil_especifico.numero_legajo }}</strong></td>
+                </tr>
+                <tr>
+                    <th>Cargo:</th>
+                    <td>{{ perfil_especifico.cargo }}</td>
+                </tr>
+                <tr>
+                    <th>Área:</th>
+                    <td>{{ perfil_especifico.area_principal }}</td>
+                </tr>
+                <tr>
+                    <th>Tipo Contrato:</th>
+                    <td>{{ perfil_especifico.get_tipo_contrato_display }}</td>
+                </tr>
+                <tr>
+                    <th>Ingreso:</th>
+                    <td>{{ perfil_especifico.fecha_ingreso_laboral|date:"d/m/Y" }}</td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Becas (Solo visible si tiene becas) -->
+    {% if becas %}
+    <div class="content-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-3">
+                <i class="bi bi-award me-2"></i>
+                Becas Asignadas
+            </h5>
+            <a href="{% url 'asignar_beca' perfil_especifico.id %}" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle me-1"></i>
+                Asignar Nueva Beca
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tipo de Beca</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for beca in becas %}
+                    <tr>
+                        <td>{{ beca.beca.tipo }}</td>
+                        <td>{{ beca.fecha_inicio|date:"d/m/Y" }}</td>
+                        <td>{{ beca.fecha_fin|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge {% if beca.estado_beca == 'ACTIVA' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ beca.get_estado_beca_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Observaciones (Adaptado al estilo content-card) -->
+    <div class="content-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+                <i class="bi bi-clock-history me-2"></i>
+                Historial de Observaciones
+            </h5>
+            {% if user.groups.all.0.name == 'Auditor' or user.is_superuser %}
+            <a href="{% url 'historial_completo' persona.id %}" class="btn btn-outline-secondary btn-sm">
+                Ver completo
+            </a>
+            {% endif %}
+        </div>
+
+        {% if observaciones %}
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Acción</th>
+                        <th>Detalle</th>
+                        <th>Usuario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obs in observaciones %}
+                    <tr>
+                        <td style="white-space: nowrap;">{{ obs.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <span class="badge {% if obs.tipo_accion == 'creacion' %}bg-success{% elif obs.tipo_accion == 'modificacion' %}bg-primary{% elif obs.tipo_accion == 'eliminacion' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ obs.get_tipo_accion_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong>{{ obs.observacion }}</strong>
+                            {% if obs.descripcion_cambio %}
+                            <br>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ obs.usuario.username }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle me-2"></i> No hay observaciones registradas.
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Estilos exactos de detalle_beneficiario.html -->
+<style>
+      :root {
+        --primary-custom: #2C7D4B;
+        --primary-dark: #1e5c35;
+    }
+
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, var(--primary-custom) 0%, var(--primary-dark) 100%) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-custom) !important;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}
