@@ -1,0 +1,18 @@
+{% extends "bienestar_layout/base_bienestar.html" %}
+{% block title %}Salud{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm rounded-4">
+        <div class="card-body">
+            <h2 class="fw-bold mb-3">Bienvenido al módulo de Salud</h2>
+            <p class="text-muted mb-4">
+                Accedé a tu cobertura, turnos e historial de atenciones desde el panel principal.
+            </p>
+            <a href="{% url 'salud:dashboard' %}" class="btn btn-success">
+                Ir al panel de salud
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

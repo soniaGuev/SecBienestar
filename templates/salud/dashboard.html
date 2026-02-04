@@ -9,40 +9,181 @@
     <div class="row g-4">
 
         <!-- Cobertura -->
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="card shadow-sm rounded-4 h-100">
                 <div class="card-body">
                     <h5 class="fw-bold">🫀 Cobertura</h5>
-                    <p class="text-muted mt-2">
-                        No tenés cobertura de salud activa.
-                    </p>
-                    <a href="#" class="btn btn-outline-success btn-sm">
-                        Contratar plan
-                    </a>
+                    {% if cobertura %}
+                        <p class="text-muted mt-2 mb-1">
+                            Plan: <strong>{{ cobertura.plan.nombre }}</strong>
+                        </p>
+                        <p class="text-muted mb-1">
+                            Prestador: {{ cobertura.plan.prestador.nombre }}
+                        </p>
+                        <p class="text-muted mb-1">
+                            Vigencia:
+                            {% if cobertura.esta_vigente %}
+                                <span class="badge bg-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactiva</span>
+                            {% endif %}
+                        </p>
+                        <p class="text-muted mb-1">
+                            Afiliado: {{ cobertura.numero_afiliado_externo|default:"Sin registrar" }}
+                        </p>
+                        <p class="text-muted mb-3">
+                            Inicio: {{ cobertura.fecha_inicio|date:"d/m/Y" }}
+                            {% if cobertura.fecha_fin %}
+                                · Fin: {{ cobertura.fecha_fin|date:"d/m/Y" }}
+                            {% endif %}
+                        </p>
+                        {% if ultimo_pago %}
+                            <div class="border rounded-3 p-2 bg-light">
+                                <small class="text-muted d-block">Último pago</small>
+                                <strong>${{ ultimo_pago.monto }}</strong>
+                                <span class="badge bg-secondary">{{ ultimo_pago.get_estado_display }}</span>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted mt-2">
+                            No tenés cobertura de salud activa.
+                        </p>
+                        <a href="#" class="btn btn-outline-success btn-sm">
+                            Solicitar cobertura
+                        </a>
+                    {% endif %}
+                    {% if afiliacion %}
+                        <hr>
+                        <h6 class="fw-bold mb-2">Obra social registrada</h6>
+                        <p class="text-muted mb-1">
+                            Prestador: {{ afiliacion.prestador.nombre }}
+                        </p>
+                        <p class="text-muted mb-1">
+                            Plan externo: {{ afiliacion.plan_nombre|default:"Sin detalle" }}
+                        </p>
+                        <p class="text-muted mb-1">
+                            Estado: <span class="badge bg-secondary">{{ afiliacion.get_estado_display }}</span>
+                        </p>
+                        <p class="text-muted mb-1">
+                            Nº afiliado: {{ afiliacion.numero_afiliado|default:"Sin registrar" }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Actualizado: {{ afiliacion.ultima_actualizacion|date:"d/m/Y H:i" }}
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Turnos -->
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="card shadow-sm rounded-4 h-100">
                 <div class="card-body">
                     <h5 class="fw-bold">📅 Turnos</h5>
-                    <p class="text-muted mt-2">
-                        No tenés turnos asignados.
-                    </p>
+                    {% if turnos %}
+                        <ul class="list-group list-group-flush mt-2">
+                            {% for turno in turnos %}
+                                <li class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-semibold">{{ turno.especialidad }}</div>
+                                            <small class="text-muted">{{ turno.prestador.nombre }}</small>
+                                            {% if turno.ubicacion %}
+                                                <small class="text-muted d-block">{{ turno.ubicacion }}</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-end">
+                                            <div>{{ turno.fecha_hora|date:"d/m/Y H:i" }}</div>
+                                            <span class="badge bg-info text-dark">{{ turno.get_estado_display }}</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mt-2">
+                            No tenés turnos asignados.
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Historial -->
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="card shadow-sm rounded-4 h-100">
                 <div class="card-body">
                     <h5 class="fw-bold">📄 Historial</h5>
-                    <p class="text-muted mt-2">
-                        No hay atenciones registradas.
-                    </p>
+                    {% if historial %}
+                        <ul class="list-group list-group-flush mt-2">
+                            {% for atencion in historial %}
+                                <li class="list-group-item px-0">
+                                    <div class="fw-semibold">{{ atencion.especialidad }}</div>
+                                    <small class="text-muted">{{ atencion.prestador.nombre }}</small>
+                                    <small class="text-muted d-block">{{ atencion.fecha|date:"d/m/Y" }}</small>
+                                    {% if atencion.diagnostico %}
+                                        <small class="text-muted d-block">Dx: {{ atencion.diagnostico }}</small>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mt-2">
+                            No hay atenciones registradas.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Integración -->
+        <div class="col-12">
+            <div class="card shadow-sm rounded-4">
+                <div class="card-body">
+                    <h5 class="fw-bold">🔗 Estado de integración con prestadores</h5>
+                    {% if integracion %}
+                        <p class="text-muted mb-1">
+                            Prestador: <strong>{{ integracion.prestador.nombre }}</strong>
+                        </p>
+                        <p class="text-muted mb-1">
+                            Base API: {{ integracion.base_url }}
+                        </p>
+                        <p class="text-muted mb-1">
+                            Autenticación: {{ integracion.get_auth_tipo_display }}
+                        </p>
+                        {% if integracion.ultima_sincronizacion %}
+                            <p class="text-muted mb-1">
+                                Última sincronización: {{ integracion.ultima_sincronizacion|date:"d/m/Y H:i" }}
+                            </p>
+                        {% endif %}
+                        {% if integracion.ultimo_estado %}
+                            <p class="mb-0">
+                                Estado:
+                                <span class="badge bg-secondary">{{ integracion.ultimo_estado }}</span>
+                            </p>
+                        {% endif %}
+                        {% if integracion.ultimo_mensaje %}
+                            <small class="text-muted d-block mt-2">{{ integracion.ultimo_mensaje }}</small>
+                        {% endif %}
+                    {% elif ultima_integracion %}
+                        <p class="text-muted mb-1">
+                            Última sincronización: {{ ultima_integracion.fecha|date:"d/m/Y H:i" }}
+                        </p>
+                        <p class="mb-1">
+                            Prestador: <strong>{{ ultima_integracion.prestador.nombre }}</strong>
+                        </p>
+                        <p class="mb-0">
+                            Estado:
+                            <span class="badge bg-secondary">{{ ultima_integracion.estado }}</span>
+                        </p>
+                        {% if ultima_integracion.mensaje %}
+                            <small class="text-muted d-block mt-2">{{ ultima_integracion.mensaje }}</small>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted mb-0">
+                            No hay sincronizaciones registradas todavía.
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
